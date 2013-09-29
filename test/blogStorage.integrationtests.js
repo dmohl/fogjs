@@ -97,15 +97,30 @@ describe("BlobStorage", function() {
     });
     
     describe("When getting a blob to text with promises", function() {
-        this.timeout(10000);
         it ('it should have the value My super awesome text to upload.', function(done) {
             var blobName = "GetBlobTest";
             createBlob(blobName).then(function() {
                 fogjs.getBlobToText(blobService, containerName, blobName)
                     .then(function(response) {
-                        console.log(response.text);
                         assert.equal(response.text, "My super awesome text to upload");
                         done();
+                    });
+            });
+        });
+    });
+    
+    describe("When getting a blob to file with promises", function() {
+        it ('it should have the value My super awesome text to upload.', function(done) {
+            var blobName = "GetBlobFileTest";
+            var fileName = "C:\\git\\fogjs\\test\\myGetBobToFileText.txt";
+            createBlob(blobName).then(function() {
+                fogjs.getBlobToFile(blobService, containerName, blobName, fileName)
+                    .then(function(response) {
+                        fs.readFile(fileName, "utf8", function (err, data) {
+                            fs.unlink(fileName);
+                            assert.equal(data, "My super awesome text to upload");
+                            done();
+                        });
                     });
             });
         });
