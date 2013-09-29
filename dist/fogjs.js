@@ -2,6 +2,7 @@ var q = require('q');
 
 var exports = {};
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 exports.createContainerIfNotExists = function (blobService, container, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -21,6 +22,7 @@ exports.createContainerIfNotExists = function (blobService, container, options) 
     return deferred.promise; 
 };
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 exports.createBlockBlobFromText = function (blobService, container, blobName, text, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -40,11 +42,64 @@ exports.createBlockBlobFromText = function (blobService, container, blobName, te
     return deferred.promise; 
 };
 
-module.exports = exports;
-;var exports = {};
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+exports.createBlockBlobFromFile = function (blobService, container, blobName, fileName, options) {
+    var deferred = q.defer();
+    var callback = function(error) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            deferred.resolve();
+        }
+    };
 
-exports.test = function () {
-	return 1;
+    if (options) {
+        blobService.createBlockBlobFromFile(container, blobName, fileName, options, callback);
+    } else {
+        blobService.createBlockBlobFromFile(container, blobName, fileName, callback);
+    }
+    
+    return deferred.promise; 
+};
+
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+exports.createBlockBlobFromStream = function (blobService, container, blobName, stream, streamLength, options) {
+    var deferred = q.defer();
+    var callback = function(error) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            deferred.resolve();
+        }
+    };
+
+    if (options) {
+        blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, options, callback);
+    } else {
+        blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, callback);
+    }
+    
+    return deferred.promise; 
+};
+
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+exports.deleteContainer = function (blobService, container, options) {
+    var deferred = q.defer();
+    var callback = function(error) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            deferred.resolve();
+        }
+    };
+
+    if (options) {
+        blobService.deleteContainer(container, options, callback);
+    } else {
+        blobService.deleteContainer(container, callback);
+    }
+    
+    return deferred.promise; 
 };
 
 module.exports = exports;
