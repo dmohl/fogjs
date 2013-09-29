@@ -3,6 +3,7 @@ var q = require('q');
 var exports = {};
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 exports.createContainerIfNotExists = function (blobService, container, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -23,6 +24,7 @@ exports.createContainerIfNotExists = function (blobService, container, options) 
 };
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 exports.createBlockBlobFromText = function (blobService, container, blobName, text, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -43,6 +45,7 @@ exports.createBlockBlobFromText = function (blobService, container, blobName, te
 };
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 exports.createBlockBlobFromFile = function (blobService, container, blobName, fileName, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -63,6 +66,7 @@ exports.createBlockBlobFromFile = function (blobService, container, blobName, fi
 };
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 exports.createBlockBlobFromStream = function (blobService, container, blobName, stream, streamLength, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -83,6 +87,7 @@ exports.createBlockBlobFromStream = function (blobService, container, blobName, 
 };
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 exports.deleteContainer = function (blobService, container, options) {
     var deferred = q.defer();
     var callback = function(error) {
@@ -102,14 +107,23 @@ exports.deleteContainer = function (blobService, container, options) {
     return deferred.promise; 
 };
 
-// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains text, blockBlob, and response is returned. 
+// As with the Azure API function, `text` will contain the blob contents, `blockBlob` will contain the blob information and 
+// `response` will contain information related to the operation.
 exports.getBlobToText = function (blobService, container, blobName, options) {
     var deferred = q.defer();
     var callback = function(error, text, blockBlob, response) {
         if (error) {
             deferred.reject(new Error(error));
         } else {
-            deferred.resolve(error, text, blockBlob, response);
+            var result = {
+                "text" : text,
+                "blockBlob" : blockBlob,
+                "response" : response
+            };
+            deferred.resolve(result);
         }
     };
 

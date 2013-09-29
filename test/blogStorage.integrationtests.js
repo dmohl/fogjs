@@ -102,8 +102,9 @@ describe("BlobStorage", function() {
             var blobName = "GetBlobTest";
             createBlob(blobName).then(function() {
                 fogjs.getBlobToText(blobService, containerName, blobName)
-                    .then(function(error, text, blockBlob, response) {
-                        assert.equal(text, "My super awesome text to upload");
+                    .then(function(response) {
+                        console.log(response.text);
+                        assert.equal(response.text, "My super awesome text to upload");
                         done();
                     });
             });
