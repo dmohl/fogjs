@@ -102,4 +102,31 @@ exports.deleteContainer = function (blobService, container, options) {
     return deferred.promise; 
 };
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+exports.getBlobToText = function (blobService, container, blobName, options) {
+    var deferred = q.defer();
+    var callback = function(error, text, blockBlob, response) {
+        console.log("here");
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            console.log(text);
+            var result = {
+                "text": text,
+                "blockBlob" : blockBlob,
+                "response" : response,
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    if (options) {
+        blobService.getBlobToText(container, blobName, stream, options, callback);
+    } else {
+        blobService.getBlobToText(container, blobName, stream, callback);
+    }
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

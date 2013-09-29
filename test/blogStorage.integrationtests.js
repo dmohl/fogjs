@@ -32,20 +32,24 @@ describe("BlobStorage", function() {
         });
     });
 
+    var createBlob = function(blobName) {
+        var promise = fogjs.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
+        return promise.then(function() {
+            return fogjs.createBlockBlobFromText(
+                blobService,
+                containerName, 
+                blobName,
+                "My super awesome text to upload"
+            );
+        });
+    };
+
     describe("When calling with text and with promises", function() {
         it ('it should upload the text as a blob.', function(done) {
-            var promise = fogjs.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
-            promise.then(function() {
-                fogjs.createBlockBlobFromText(
-                    blobService,
-                    containerName, 
-                    "TestBlobText2",
-                    "My super awesome text to upload"
-                ).then(function() {
+            createBlob("TestBlobText2").then(function() {
                     assert.equal(1,1);
                     done();
                 });
-            });
         });
     });
 
@@ -89,6 +93,20 @@ describe("BlobStorage", function() {
             var deleteContainerName = "deletecontainertest";
             var promise = fogjs.createContainerIfNotExists(blobService, deleteContainerName, {publicAccessLevel : 'blob'});
             fogjs.deleteContainer(blobService, deleteContainerName).then(done());
+        });
+    });
+    
+    describe("When getting a blob to text with promises", function() {
+        this.timeout(10000);
+        it ('it should have the value My super awesome text to upload.', function(done) {
+            var blobName = "GetBlobTest";
+            createBlob(blobName).then(function() {
+                fogjs.getBlobToText(blobService, containerName, blobName)
+                    .then(function(error, text, blockBlob, response) {
+                        assert.equal(text, "My super awesome text to upload");
+                        done();
+                    });
+            });
         });
     });
 });    
