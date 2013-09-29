@@ -8,8 +8,9 @@ var containerName = "testcontainer";
 describe("BlobStorage", function() {
 
     after(function(done) {
-        fogjs.deleteContainer(blobService, containerName)
-        .then(done());
+        blobService.deleteContainer(containerName, function() {
+            done();
+        });
     });
       
     describe("When calling with text and the standard JS code", function() {
@@ -80,6 +81,14 @@ describe("BlobStorage", function() {
                     });
                 });
             });
+        });
+    });
+    
+    describe("When deleting a container with promises", function() {
+        it ('it should delete successfully.', function(done) {
+            var deleteContainerName = "deletecontainertest";
+            var promise = fogjs.createContainerIfNotExists(blobService, deleteContainerName, {publicAccessLevel : 'blob'});
+            fogjs.deleteContainer(blobService, deleteContainerName).then(done());
         });
     });
 });    
