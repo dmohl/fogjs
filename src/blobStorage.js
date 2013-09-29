@@ -164,4 +164,32 @@ exports.getBlobToFile = function (blobService, container, blobName, fileName, op
     return deferred.promise; 
 };
 
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains blockBlob and response is returned. 
+// As with the Azure API function, `blockBlob` will contain the blob information and 
+// `response` will contain information related to the operation.
+exports.getBlobToStream = function (blobService, container, blobName, writeStream, options) {
+    var deferred = q.defer();
+    var callback = function(error, blockBlob, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            var result = {
+                "blockBlob" : blockBlob,
+                "response" : response
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    if (options) {
+        blobService.getBlobToStream(container, blobName, writeStream, options, callback);
+    } else {
+        blobService.getBlobToStream(container, blobName, writeStream, callback);
+    }
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

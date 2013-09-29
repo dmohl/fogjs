@@ -112,9 +112,26 @@ describe("BlobStorage", function() {
     describe("When getting a blob to file with promises", function() {
         it ('it should have the value My super awesome text to upload.', function(done) {
             var blobName = "GetBlobFileTest";
-            var fileName = "C:\\git\\fogjs\\test\\myGetBobToFileText.txt";
+            var fileName = "C:\\git\\fogjs\\test\\myGetBobToFileTest.txt";
             createBlob(blobName).then(function() {
                 fogjs.getBlobToFile(blobService, containerName, blobName, fileName)
+                    .then(function(response) {
+                        fs.readFile(fileName, "utf8", function (err, data) {
+                            fs.unlink(fileName);
+                            assert.equal(data, "My super awesome text to upload");
+                            done();
+                        });
+                    });
+            });
+        });
+    });
+    
+    describe("When getting a blob to stream with promises", function() {
+        it ('it should have the value My super awesome text to upload.', function(done) {
+            var blobName = "GetBlobStreamTest";
+            var fileName = "C:\\git\\fogjs\\test\\myGetBobToStreamTest.txt";
+            createBlob(blobName).then(function() {
+                fogjs.getBlobToStream(blobService, containerName, blobName, fs.createWriteStream(fileName))
                     .then(function(response) {
                         fs.readFile(fileName, "utf8", function (err, data) {
                             fs.unlink(fileName);
