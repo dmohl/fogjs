@@ -142,4 +142,17 @@ describe("BlobStorage", function() {
             });
         });
     });
+    
+    describe("When getting deleting a blob with promises", function() {
+        it ('it should finish without an erro.', function(done) {
+            var blobName = "DeleteBlobTest";
+            createBlob(blobName)
+                .then(function() {
+                    return fogjs.deleteBlob(blobService, containerName, blobName);
+                }).then(function(response) {
+                    assert.equal(true, response.isSuccessful);
+                    done();
+                });
+        });
+    });    
 });    
