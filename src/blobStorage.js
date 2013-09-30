@@ -1,6 +1,9 @@
 var q = require('q');
+var azure = require('azure');
 
 var exports = {};
+
+var defaultBlobService = azure.createBlobService();
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
@@ -35,7 +38,7 @@ exports.createContainerIfNotExists = function (blobService, container, options) 
 // If no error message is returned, then an object literal that contains blockBlob and response is returned. 
 // As with the Azure API function, `blockBlob` will contain the blob information and 
 // `response` will be returned containing information related to the operation.
-exports.createBlockBlobFromText = function (blobService, container, blobName, text, options) {
+exports.createBlockBlobFromText = function (blobServiceOrAllParams, container, blobName, text, options) {
     var deferred = q.defer();
     var callback = function(error, blockBlob, response) {
         if (error) {
@@ -49,10 +52,24 @@ exports.createBlockBlobFromText = function (blobService, container, blobName, te
         }
     };
 
-    if (options) {
-        blobService.createBlockBlobFromText(container, blobName, text, options, callback);
+    var createTheBlob = function(blobService) {
+        if (options) {
+            blobService.createBlockBlobFromText(container, blobName, text, options, callback);
+        } else {
+            blobService.createBlockBlobFromText(container, blobName, text, callback);
+        }
+    };
+
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        text = blobServiceOrAllParams.blobText;
+        options = blobServiceOrAllParams.options;
+        defaultBlobService.createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
+            createTheBlob(defaultBlobService);
+        });
     } else {
-        blobService.createBlockBlobFromText(container, blobName, text, callback);
+        createTheBlob(blobServiceOrAllParams);
     }
     
     return deferred.promise; 
@@ -141,7 +158,7 @@ exports.deleteContainer = function (blobService, container, options) {
 // If no error message is returned, then an object literal that contains text, blockBlob, and response is returned. 
 // As with the Azure API function, `text` will contain the blob contents, `blockBlob` will contain the blob information and 
 // `response` will contain information related to the operation.
-exports.getBlobToText = function (blobService, container, blobName, options) {
+exports.getBlobToText = function (blobServiceOrAllParams, container, blobName, options) {
     var deferred = q.defer();
     var callback = function(error, text, blockBlob, response) {
         if (error) {
@@ -156,10 +173,23 @@ exports.getBlobToText = function (blobService, container, blobName, options) {
         }
     };
 
-    if (options) {
-        blobService.getBlobToText(container, blobName, options, callback);
+    var getTheBlob = function(blobService) {
+        if (options) {
+            blobService.getBlobToText(container, blobName, options, callback);
+        } else {
+            blobService.getBlobToText(container, blobName, callback);
+        }
+    };
+    
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        options = blobServiceOrAllParams.options;
+        defaultBlobService.createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
+            getTheBlob(defaultBlobService);
+        });
     } else {
-        blobService.getBlobToText(container, blobName, callback);
+        getTheBlob(blobServiceOrAllParams);
     }
     
     return deferred.promise; 
@@ -226,7 +256,7 @@ exports.getBlobToStream = function (blobService, container, blobName, writeStrea
 // If no error message is returned, then an object literal that contains isSuccessful and response is returned. 
 // As with the Azure API function, `isSuccessful` will be true if the delete request succeeded and 
 // `response` will contain information related to the operation.
-exports.deleteBlob = function (blobService, container, blobName, options) {
+exports.deleteBlob = function (blobServiceOrAllParams, container, blobName, options) {
     var deferred = q.defer();
     var callback = function(error, isSuccessful, response) {
         if (error) {
@@ -240,10 +270,24 @@ exports.deleteBlob = function (blobService, container, blobName, options) {
         }
     };
 
-    if (options) {
-        blobService.deleteBlob(container, blobName, options, callback);
+    var deleteTheBlob = function(blobService) {
+        if (options) {
+            blobService.deleteBlob(container, blobName, options, callback);
+        } else {
+            blobService.deleteBlob(container, blobName, callback);
+        }
+    };
+    
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        options = blobServiceOrAllParams.options;
+        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+            .then(function() {
+                deleteTheBlob(defaultBlobService);
+            });
     } else {
-        blobService.deleteBlob(container, blobName, callback);
+        deleteTheBlob(blobServiceOrAllParams);
     }
     
     return deferred.promise; 

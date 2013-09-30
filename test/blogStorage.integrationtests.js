@@ -1,11 +1,12 @@
 var assert = require("assert");
-var fogjs = require("../src/blobStorage.js");
+var fogBlob = require("../src/blobStorage.js");
 var azure = require('azure');
 var fs = require('fs');
 var blobService = azure.createBlobService();
 var containerName = "testcontainer";
 
 describe("BlobStorage", function() {
+    this.timeout(5000);
 
     after(function(done) {
         blobService.deleteContainer(containerName, function() {
@@ -33,9 +34,9 @@ describe("BlobStorage", function() {
     });
 
     var createBlob = function(blobName) {
-        var promise = fogjs.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
+        var promise = fogBlob.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
         return promise.then(function() {
-            return fogjs.createBlockBlobFromText(
+            return fogBlob.createBlockBlobFromText(
                 blobService,
                 containerName, 
                 blobName,
@@ -55,9 +56,9 @@ describe("BlobStorage", function() {
 
     describe("When calling with a file and with promises", function() {
         it ('it should upload the file.', function(done) {
-            var promise = fogjs.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
+            var promise = fogBlob.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
             promise.then(function() {
-                fogjs.createBlockBlobFromFile(
+                fogBlob.createBlockBlobFromFile(
                     blobService,
                     containerName, 
                     "TestBlobFile",
@@ -72,13 +73,13 @@ describe("BlobStorage", function() {
 
     describe("When calling with a stream and with promises", function() {
         it ('it should upload the stream into blob storage.', function(done) {
-            var promise = fogjs.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
+            var promise = fogBlob.createContainerIfNotExists(blobService, containerName, {publicAccessLevel : 'blob'});
             var filePath = "C:\\git\\fogjs\\readme.md";
             fs.stat(filePath, function(error, stat) {
                 var length = stat.size;
                 var stream = fs.createReadStream(filePath);
                 promise.then(function() {
-                    fogjs.createBlockBlobFromStream(blobService, containerName, "TestBlobStream", stream, length)
+                    fogBlob.createBlockBlobFromStream(blobService, containerName, "TestBlobStream", stream, length)
                     .then(function() {
                         assert.equal(1,1);
                         done();
@@ -91,8 +92,8 @@ describe("BlobStorage", function() {
     describe("When deleting a container with promises", function() {
         it ('it should delete successfully.', function(done) {
             var deleteContainerName = "deletecontainertest";
-            var promise = fogjs.createContainerIfNotExists(blobService, deleteContainerName, {publicAccessLevel : 'blob'});
-            fogjs.deleteContainer(blobService, deleteContainerName).then(done());
+            var promise = fogBlob.createContainerIfNotExists(blobService, deleteContainerName, {publicAccessLevel : 'blob'});
+            fogBlob.deleteContainer(blobService, deleteContainerName).then(done());
         });
     });
     
@@ -100,7 +101,7 @@ describe("BlobStorage", function() {
         it ('it should have the value My super awesome text to upload.', function(done) {
             var blobName = "GetBlobTest";
             createBlob(blobName).then(function() {
-                fogjs.getBlobToText(blobService, containerName, blobName)
+                fogBlob.getBlobToText(blobService, containerName, blobName)
                     .then(function(response) {
                         assert.equal(response.text, "My super awesome text to upload");
                         done();
@@ -114,7 +115,7 @@ describe("BlobStorage", function() {
             var blobName = "GetBlobFileTest";
             var fileName = "C:\\git\\fogjs\\test\\myGetBobToFileTest.txt";
             createBlob(blobName).then(function() {
-                fogjs.getBlobToFile(blobService, containerName, blobName, fileName)
+                fogBlob.getBlobToFile(blobService, containerName, blobName, fileName)
                     .then(function(response) {
                         fs.readFile(fileName, "utf8", function (err, data) {
                             fs.unlink(fileName);
@@ -131,7 +132,7 @@ describe("BlobStorage", function() {
             var blobName = "GetBlobStreamTest";
             var fileName = "C:\\git\\fogjs\\test\\myGetBobToStreamTest.txt";
             createBlob(blobName).then(function() {
-                fogjs.getBlobToStream(blobService, containerName, blobName, fs.createWriteStream(fileName))
+                fogBlob.getBlobToStream(blobService, containerName, blobName, fs.createWriteStream(fileName))
                     .then(function(response) {
                         fs.readFile(fileName, "utf8", function (err, data) {
                             fs.unlink(fileName);
@@ -143,16 +144,43 @@ describe("BlobStorage", function() {
         });
     });
     
-    describe("When getting deleting a blob with promises", function() {
-        it ('it should finish without an erro.', function(done) {
+    describe("When deleting a blob with promises", function() {
+        it ('it should finish without an error.', function(done) {
             var blobName = "DeleteBlobTest";
             createBlob(blobName)
                 .then(function() {
-                    return fogjs.deleteBlob(blobService, containerName, blobName);
+                    return fogBlob.deleteBlob(blobService, containerName, blobName);
                 }).then(function(response) {
                     assert.equal(true, response.isSuccessful);
                     done();
                 });
+        });
+    });    
+    
+    describe("When creating, getting, and deleting a blob with simple syntax", function() {
+        this.timeout("10000");
+        it ('it should finish without an error.', function(done) {
+            var blobName = "simpleSyntaxBlob";
+            var containerName = "simplesyntaxcontainer";
+            fogBlob.createBlockBlobFromText({
+                "containerName": containerName, 
+                "blobName" : blobName, 
+                "blobText": "My super awesome text to upload"
+            }).then(function() {
+                return fogBlob.getBlobToText({
+                    "containerName": containerName, 
+                    "blobName" : blobName
+                });
+            }).then(function(response) {
+                assert.equal("My super awesome text to upload", response.text);
+                return fogBlob.deleteBlob({
+                    "containerName": containerName, 
+                    "blobName" : blobName
+                });                    
+            }).then(function(response) {
+                assert.equal(true, response.isSuccessful);
+                done();
+            });
         });
     });    
 });    
