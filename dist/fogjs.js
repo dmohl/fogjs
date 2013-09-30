@@ -80,7 +80,7 @@ exports.createBlockBlobFromText = function (blobServiceOrAllParams, container, b
 // If no error message is returned, then an object literal that contains blockBlob and response is returned. 
 // As with the Azure API function, `blockBlob` will contain the blob information and 
 // `response` will be returned containing information related to the operation.
-exports.createBlockBlobFromFile = function (blobService, container, blobName, fileName, options) {
+exports.createBlockBlobFromFile = function (blobServiceOrAllParams, container, blobName, fileName, options) {
     var deferred = q.defer();
     var callback = function(error, blockBlob, response) {
         if (error) {
@@ -94,12 +94,27 @@ exports.createBlockBlobFromFile = function (blobService, container, blobName, fi
         }
     };
 
-    if (options) {
-        blobService.createBlockBlobFromFile(container, blobName, fileName, options, callback);
-    } else {
-        blobService.createBlockBlobFromFile(container, blobName, fileName, callback);
-    }
+    var createTheBlob = function(blobService) {
+        if (options) {
+            blobService.createBlockBlobFromFile(container, blobName, fileName, options, callback);
+        } else {
+            blobService.createBlockBlobFromFile(container, blobName, fileName, callback);
+        }
+    };
     
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        fileName = blobServiceOrAllParams.fileName;
+        options = blobServiceOrAllParams.options;
+        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+            .then(function() {
+                createTheBlob(defaultBlobService);
+            });
+    } else {
+        createTheBlob(blobServiceOrAllParams);
+    }
+
     return deferred.promise; 
 };
 
@@ -108,7 +123,7 @@ exports.createBlockBlobFromFile = function (blobService, container, blobName, fi
 // If no error message is returned, then an object literal that contains blockBlob and response is returned. 
 // As with the Azure API function, `blockBlob` will contain the blob information and 
 // `response` will be returned containing information related to the operation.
-exports.createBlockBlobFromStream = function (blobService, container, blobName, stream, streamLength, options) {
+exports.createBlockBlobFromStream = function (blobServiceOrAllParams, container, blobName, stream, streamLength, options) {
     var deferred = q.defer();
     var callback = function(error, blockBlob, response) {
         if (error) {
@@ -122,10 +137,26 @@ exports.createBlockBlobFromStream = function (blobService, container, blobName, 
         }
     };
 
-    if (options) {
-        blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, options, callback);
+    var createTheBlob = function(blobService) {
+        if (options) {
+            blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, options, callback);
+        } else {
+            blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, callback);
+        }
+    };
+    
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        stream = blobServiceOrAllParams.stream;
+        streamLength = blobServiceOrAllParams.streamLength;
+        options = blobServiceOrAllParams.options;
+        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+            .then(function() {
+                createTheBlob(defaultBlobService);
+            });
     } else {
-        blobService.createBlockBlobFromStream(container, blobName, stream, streamLength, callback);
+        createTheBlob(blobServiceOrAllParams);
     }
     
     return deferred.promise; 
@@ -200,7 +231,7 @@ exports.getBlobToText = function (blobServiceOrAllParams, container, blobName, o
 // If no error message is returned, then an object literal that contains blockBlob and response is returned. 
 // As with the Azure API function, `blockBlob` will contain the blob information and 
 // `response` will contain information related to the operation.
-exports.getBlobToFile = function (blobService, container, blobName, fileName, options) {
+exports.getBlobToFile = function (blobServiceOrAllParams, container, blobName, fileName, options) {
     var deferred = q.defer();
     var callback = function(error, blockBlob, response) {
         if (error) {
@@ -214,10 +245,25 @@ exports.getBlobToFile = function (blobService, container, blobName, fileName, op
         }
     };
 
-    if (options) {
-        blobService.getBlobToFile(container, blobName, fileName, options, callback);
+    var getTheBlob = function(blobService) {
+        if (options) {
+            blobService.getBlobToFile(container, blobName, fileName, options, callback);
+        } else {
+            blobService.getBlobToFile(container, blobName, fileName, callback);
+        }
+    };
+    
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        fileName = blobServiceOrAllParams.fileName;
+        options = blobServiceOrAllParams.options;
+        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+            .then(function() {
+                getTheBlob(defaultBlobService);
+            });
     } else {
-        blobService.getBlobToFile(container, blobName, fileName, callback);
+        getTheBlob(blobServiceOrAllParams);
     }
     
     return deferred.promise; 
@@ -228,7 +274,7 @@ exports.getBlobToFile = function (blobService, container, blobName, fileName, op
 // If no error message is returned, then an object literal that contains blockBlob and response is returned. 
 // As with the Azure API function, `blockBlob` will contain the blob information and 
 // `response` will contain information related to the operation.
-exports.getBlobToStream = function (blobService, container, blobName, writeStream, options) {
+exports.getBlobToStream = function (blobServiceOrAllParams, container, blobName, writeStream, options) {
     var deferred = q.defer();
     var callback = function(error, blockBlob, response) {
         if (error) {
@@ -242,12 +288,27 @@ exports.getBlobToStream = function (blobService, container, blobName, writeStrea
         }
     };
 
-    if (options) {
-        blobService.getBlobToStream(container, blobName, writeStream, options, callback);
-    } else {
-        blobService.getBlobToStream(container, blobName, writeStream, callback);
-    }
+    var getTheBlob = function(blobService) {
+        if (options) {
+            blobService.getBlobToStream(container, blobName, writeStream, options, callback);
+        } else {
+            blobService.getBlobToStream(container, blobName, writeStream, callback);
+        }
+    };
     
+    if (blobServiceOrAllParams && blobServiceOrAllParams.containerName) {
+        container = blobServiceOrAllParams.containerName;
+        blobName = blobServiceOrAllParams.blobName;
+        writeStream = blobServiceOrAllParams.writeStream;
+        options = blobServiceOrAllParams.options;
+        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+            .then(function() {
+                getTheBlob(defaultBlobService);
+            });
+    } else {
+        getTheBlob(blobServiceOrAllParams);
+    }
+
     return deferred.promise; 
 };
 

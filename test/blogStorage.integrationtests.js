@@ -183,4 +183,74 @@ describe("BlobStorage", function() {
             });
         });
     });    
+
+    describe("When creating, getting, and deleting a blob (from file) with simple syntax", function() {
+        this.timeout("10000");
+        it ('it should finish without an error.', function(done) {
+            var blobName = "simpleSyntaxBlobFromFile";
+            var containerName = "simplesyntaxcontainer";
+            var filePath = "C:\\git\\fogjs\\readme.md";
+            var newFileName = "C:\\git\\fogjs\\test\\testfile.md";
+            fogBlob.createBlockBlobFromFile({
+                "containerName": containerName, 
+                "blobName" : blobName, 
+                "fileName": filePath
+            }).then(function() {
+                return fogBlob.getBlobToFile({
+                    "containerName": containerName, 
+                    "blobName" : blobName,
+                    "fileName" : newFileName
+                });
+            }).then(function(response) {
+                fs.readFile(newFileName, "utf8", function (err, data) {
+                    fs.unlink(newFileName);
+                });
+                return fogBlob.deleteBlob({
+                    "containerName": containerName, 
+                    "blobName" : blobName
+                });                    
+            }).then(function(response) {
+                assert.equal(true, response.isSuccessful);
+                done();
+            });
+        });
+    });    
+
+    describe("When creating, getting, and deleting a blob (from stream) with simple syntax", function() {
+        this.timeout("10000");
+        it ('it should finish without an error.', function(done) {
+            var blobName = "simpleSyntaxBlobFromFile";
+            var containerName = "simplesyntaxcontainer";
+            var filePath = "C:\\git\\fogjs\\readme.md";
+            var newFileName = "C:\\git\\fogjs\\test\\testfilefromstream.txt";
+            fs.stat(filePath, function(error, stat) {
+                var length = stat.size;
+                var stream = fs.createReadStream(filePath);
+                
+                fogBlob.createBlockBlobFromStream({
+                    "containerName": containerName, 
+                    "blobName" : blobName, 
+                    "stream": stream,
+                    "streamLength": length
+                }).then(function() {
+                    return fogBlob.getBlobToStream({
+                        "containerName": containerName, 
+                        "blobName" : blobName,
+                        "writeStream" : fs.createWriteStream(newFileName)
+                    });
+                }).then(function(response) {
+                    fs.readFile(newFileName, "utf8", function (err, data) {
+                        fs.unlink(newFileName);
+                    });
+                    return fogBlob.deleteBlob({
+                        "containerName": containerName, 
+                        "blobName" : blobName
+                    });                    
+                }).then(function(response) {
+                    assert.equal(true, response.isSuccessful);
+                    done();
+                });
+            });
+        });
+    });    
 });    
