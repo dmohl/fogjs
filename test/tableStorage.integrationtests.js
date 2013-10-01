@@ -102,12 +102,90 @@ describe("TableStorage", function() {
     });
     
     // Test queryEntity with promise
+    describe("When querying an entity with promises", function() {
+        it ('it should return an entity with key of 5.', function(done) {
+            var rowKey = "5";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    return fog.queryEntity(tableService, tableName, partitionKey, rowKey);
+                }).then(function(response) {
+                    assert.equal(response.entity.RowKey, rowKey);
+                    return fog.deleteEntity({
+                        "tableName" : tableName, 
+                        "entityDescriptor": {  
+                            "PartitionKey" : partitionKey,
+                            "RowKey" : rowKey,
+                        }
+                    });
+                }).then(done());
+        });
+    });
     
     // Test queryEntity with simple syntax
+    describe("When querying an entity with simple syntax", function() {
+        it ('it should return an entity with key of 6.', function(done) {
+            var rowKey = "6";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    return  fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.RowKey, rowKey);
+                    return fog.deleteEntity({
+                        "tableName" : tableName, 
+                        "entityDescriptor": {  
+                                "PartitionKey" : partitionKey,
+                                "RowKey" : rowKey,
+                            }
+                        });
+                }).then(done());
+        });
+    });
     
     // Test queryEntities with promise
+    describe("When querying entities with promises", function() {
+        it ('it should return more than one entity.', function(done) {
+            var rowKey = "7";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var query = azure.TableQuery
+                        .select("MyCustomField")
+                        .from(tableName)
+                        .where("PartitionKey eq ?", partitionKey);
+                    return fog.queryEntities(tableService, query);
+                }).then(function(response) {
+                    assert(response.entities.length > 1, rowKey);
+                    done();
+                });
+        });
+    });
     
     // Test queryEntities with simple syntax
+    describe("When querying entities with simple syntax", function() {
+        it ('it should return more than one entity.', function(done) {
+            var rowKey = "8";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var query = azure.TableQuery
+                        .select("MyCustomField")
+                        .from(tableName)
+                        .where("PartitionKey eq ?", partitionKey);
+                    return fog.queryEntities({"tableQuery" : query});
+                }).then(function(response) {
+                    assert(response.entities.length > 1, rowKey);
+                    done();
+                });
+        });
+    });
 
     // Test for updateEntity with promise
     
