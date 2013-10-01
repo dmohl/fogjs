@@ -82,7 +82,7 @@ describe("TableStorage", function() {
     });
     
     // Test for deleteEntity with simple syntax
-    describe("When deleting an entity with promises", function() {
+    describe("When deleting an entity with promises and a simple syntax", function() {
         it ('it should return true in the successful property.', function(done) {
             var rowKey = "4";
             createEntity(rowKey)

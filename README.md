@@ -76,16 +76,23 @@ Table Storage has features simpler to those already described for Blob Storage. 
     var fog = require("../src/tableStorage.js");
 
     var testTableName = "testTableName";
+    var rowKey = "myRowKey";
     fog.insertEntity({
         "tableName" : testTableName,
         "entity": {
             "PartitionKey" : "testPartition",
-            "RowKey" : "2",
+            "RowKey" : rowKey,
             "MyCustomField" : "Legends of Awesomeness!"
         }
     }).then(function(response){
         console.log(response.entity.RowKey);
-        return fog.deleteTable(tableService, testTableName);
+        return fog.deleteEntity({
+            "tableName" : testTableName, 
+            "entityDescriptor": {  
+                "PartitionKey" : "testPartition",
+                "RowKey" : rowKey,
+            }
+        });
     });
             
 **Queue Storage**
