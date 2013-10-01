@@ -64,8 +64,42 @@ describe("TableStorage", function() {
     });
     
     // Test for deleteEntity with promise
+    describe("When deleting an entity with promises", function() {
+        it ('it should return true in the successful property.', function(done) {
+            var rowKey = "3";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var entityDescriptor = {  
+                        "PartitionKey" : "testPartition",
+                        "RowKey" : rowKey,
+                    };
+                    return fog.deleteEntity(tableService, tableName, entityDescriptor);
+                }).then(function(response) {
+                    assert.equal(response.successful, true);
+                    done();
+                });
+        });
+    });
     
     // Test for deleteEntity with simple syntax
+    describe("When deleting an entity with promises", function() {
+        it ('it should return true in the successful property.', function(done) {
+            var rowKey = "4";
+            createEntity(rowKey)
+                .then(function(response) {
+                    return fog.deleteEntity({
+                        "tableName" : tableName, 
+                        "entityDescriptor": {  
+                            "PartitionKey" : "testPartition",
+                            "RowKey" : rowKey,
+                        }
+                    });
+                }).then(function(response) {
+                    assert.equal(response.successful, true);
+                    done();
+                });
+        });
+    });
     
     // Test queryEntity with promise
     

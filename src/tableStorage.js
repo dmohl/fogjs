@@ -101,4 +101,46 @@ exports.insertEntity = function (tableServiceOrAllParams, tableName, entity, opt
     return deferred.promise; 
 };
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains successful and response is returned. 
+// As with the Azure API function, `successful` will contain true and
+// `response` will be returned containing information related to the operation.
+exports.deleteEntity = function (tableServiceOrAllParams, tableName, entityDescriptor, options) {
+    var deferred = q.defer();
+    var callback = function(error, successful, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            var result = {
+                "successful" : successful,
+                "response" : response
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    var deleteTheEntity = function(tableService) {
+        if (options) {
+            tableService.deleteEntity(tableName, entityDescriptor, options, callback);
+        } else {
+            tableService.deleteEntity(tableName, entityDescriptor, callback);
+        }
+    };
+    
+    if (tableServiceOrAllParams && tableServiceOrAllParams.tableName) {
+        tableName = tableServiceOrAllParams.tableName;
+        entityDescriptor = tableServiceOrAllParams.entityDescriptor;
+        options = tableServiceOrAllParams.options;
+        exports.createTableIfNotExists(defaultTableService, tableName)
+            .then(function() {
+                deleteTheEntity(defaultTableService);
+            });
+    } else {
+        deleteTheEntity(tableServiceOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

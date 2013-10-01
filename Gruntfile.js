@@ -27,6 +27,7 @@ module.exports = function(grunt) {
           reporter: 'spec'
         },
         src: ['test/**/*.js']
+        //src: ['test/**/tableStorage.integrationtests.js']
       }
     },
     jshint: {
