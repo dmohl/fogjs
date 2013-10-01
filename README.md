@@ -71,8 +71,23 @@ Here's an example of chaining together a create, followed by a get, followed by 
 
 **Table Storage**
 
-Coming soon...
+Table Storage has features simpler to those already described for Blob Storage. The simple syntax looks like this:
 
+    var fog = require("../src/tableStorage.js");
+
+    var testTableName = "testTableName";
+    fog.insertEntity({
+        "tableName" : testTableName,
+        "entity": {
+            "PartitionKey" : "testPartition",
+            "RowKey" : "2",
+            "MyCustomField" : "Legends of Awesomeness!"
+        }
+    }).then(function(response){
+        console.log(response.entity.RowKey);
+        return fog.deleteTable(tableService, testTableName);
+    });
+            
 **Queue Storage**
 
 Coming soon...
