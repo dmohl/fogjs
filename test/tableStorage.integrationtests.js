@@ -290,15 +290,104 @@ describe("TableStorage", function() {
     });
     
     // Test insertOrReplaceEntity with promise
+    describe("When inserting or replacing an entity with a promise", function() {
+        it ('it should return a MyCustomField value of checkmate.', function(done) {
+            var rowKey = "13";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField = "checkmate";
+                    return fog.insertOrReplaceEntity(tableService, tableName, newEntity);
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    done();
+                });
+        });
+    });
     
     // Test insertOrReplaceEntity with simple syntax
+    describe("When inserting or replacing an entity with simple syntax", function() {
+        it ('it should return a MyCustomField value of checkmate.', function(done) {
+            var rowKey = "14";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField = "checkmate";
+                    return fog.insertOrReplaceEntity({"tableName" : tableName, "entity" : newEntity});
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    done();
+                });
+        });
+    });
     
-    // Test insertOrMergEntity with promise
+    // Test insertOrMergeEntity with promise
+    describe("When inserting or merging an entity with a promise", function() {
+        it ('it should return a MyCustomField2 value of checkmate.', function(done) {
+            var rowKey = "15";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField2 = "checkmate";
+                    return fog.insertOrMergeEntity(tableService, tableName, newEntity);
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField2, "checkmate");
+                    assert.equal(response.entity.MyCustomField, "Legends of Awesomeness!");
+                    done();
+                });
+        });
+    });
     
-    // Test insertOrMergEntity with simple syntax
-    
-    // Test commitBatch with promise
-    
-    // Test commitBatch with simple syntax?
-    
-});    
+    // Test insertOrMergeEntity with simple syntax
+    describe("When inserting or merging an entity with simple syntax", function() {
+        it ('it should return a MyCustomField2 value of checkmate.', function(done) {
+            var rowKey = "16";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField2 = "checkmate";
+                    return fog.insertOrMergeEntity ({"tableName" : tableName, "entity" : newEntity});
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField2, "checkmate");
+                    assert.equal(response.entity.MyCustomField, "Legends of Awesomeness!");
+                    done();
+                });
+        });
+    });
+});
