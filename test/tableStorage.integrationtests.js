@@ -198,7 +198,6 @@ describe("TableStorage", function() {
                     newEntity.MyCustomField = "checkmate";
                     return fog.updateEntity(tableService, tableName, newEntity);
                 }).then(function(response) {
-                    assert.equal(response.entity.MyCustomField, "checkmate");
                     return fog.queryEntity({
                             "tableName" : tableName, 
                             "entityDescriptor": {  
@@ -224,7 +223,6 @@ describe("TableStorage", function() {
                     newEntity.MyCustomField = "checkmate";
                     return fog.updateEntity({"tableName" : tableName, "entity" : newEntity});
                 }).then(function(response) {
-                    assert.equal(response.entity.MyCustomField, "checkmate");
                     return fog.queryEntity({
                             "tableName" : tableName, 
                             "entityDescriptor": {  
@@ -240,8 +238,56 @@ describe("TableStorage", function() {
     });
     
     // Test for mergeEntity with promise
+    describe("When merging an entity with a promise", function() {
+        it ('it should return a MyCustomField2 value of checkmate.', function(done) {
+            var rowKey = "11";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField2 = "checkmate";
+                    return fog.mergeEntity(tableService, tableName, newEntity);
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField2, "checkmate");
+                    assert.equal(response.entity.MyCustomField, "Legends of Awesomeness!");
+                    done();
+                });
+        });
+    });
     
     // Test for mergeEntity with simple syntax
+    describe("When merging an entity with simple syntax", function() {
+        it ('it should return a MyCustomField2 value of checkmate.', function(done) {
+            var rowKey = "12";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField2 = "checkmate";
+                    return fog.mergeEntity({"tableName" : tableName, "entity" : newEntity});
+                }).then(function(response) {
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField2, "checkmate");
+                    assert.equal(response.entity.MyCustomField, "Legends of Awesomeness!");
+                    done();
+                });
+        });
+    });
     
     // Test insertOrReplaceEntity with promise
     

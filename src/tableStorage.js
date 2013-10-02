@@ -1,5 +1,6 @@
 var q = require("q");
 var azure = require("azure");
+var util = require("util");
 
 var exports = {};
 
@@ -232,7 +233,7 @@ exports.queryEntities = function (tableServiceOrAllParams, tableQuery, options) 
 // `response` will be returned containing information related to the operation.
 exports.updateEntity = function (tableServiceOrAllParams, tableName, entity, options) {
     var deferred = q.defer();
-    var callback = function(error, entityWithETag, response) {
+    var callback = function(error, entity, response) {
         if (error) {
             deferred.reject(new Error(error));
         } else {
@@ -259,6 +260,45 @@ exports.updateEntity = function (tableServiceOrAllParams, tableName, entity, opt
         updateTheEntity(defaultTableService);
     } else {
         updateTheEntity(tableServiceOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains entity and response is returned. 
+// As with the Azure API function, `entity` will contain the entity and
+// `response` will be returned containing information related to the operation.
+exports.mergeEntity = function (tableServiceOrAllParams, tableName, entity, options) {
+    var deferred = q.defer();
+    var callback = function(error, entity, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            var result = {
+                "entity" : entity,
+                "response" : response
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    var mergeTheEntity = function(tableService) {
+        if (options) {
+            tableService.mergeEntity(tableName, entity, options, callback);
+        } else {
+            tableService.mergeEntity(tableName, entity, callback);
+        }
+    };
+    
+    if (tableServiceOrAllParams && tableServiceOrAllParams.tableName) {
+        tableName = tableServiceOrAllParams.tableName;
+        entity = tableServiceOrAllParams.entity;
+        options = tableServiceOrAllParams.options;
+        mergeTheEntity(defaultTableService);
+    } else {
+        mergeTheEntity(tableServiceOrAllParams);
     }    
     
     return deferred.promise; 
