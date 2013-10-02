@@ -225,4 +225,43 @@ exports.queryEntities = function (tableServiceOrAllParams, tableQuery, options) 
     return deferred.promise; 
 };
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains entity and response is returned. 
+// As with the Azure API function, `entity` will contain the entity and
+// `response` will be returned containing information related to the operation.
+exports.updateEntity = function (tableServiceOrAllParams, tableName, entity, options) {
+    var deferred = q.defer();
+    var callback = function(error, entityWithETag, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            var result = {
+                "entity" : entity,
+                "response" : response
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    var updateTheEntity = function(tableService) {
+        if (options) {
+            tableService.updateEntity(tableName, entity, options, callback);
+        } else {
+            tableService.updateEntity(tableName, entity, callback);
+        }
+    };
+    
+    if (tableServiceOrAllParams && tableServiceOrAllParams.tableName) {
+        tableName = tableServiceOrAllParams.tableName;
+        entity = tableServiceOrAllParams.entity;
+        options = tableServiceOrAllParams.options;
+        updateTheEntity(defaultTableService);
+    } else {
+        updateTheEntity(tableServiceOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

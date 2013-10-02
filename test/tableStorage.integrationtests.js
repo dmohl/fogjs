@@ -188,8 +188,56 @@ describe("TableStorage", function() {
     });
 
     // Test for updateEntity with promise
+    describe("When updating an entity with a promise", function() {
+        it ('it should return a MyCustomField value of checkmate.', function(done) {
+            var rowKey = "9";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField = "checkmate";
+                    return fog.updateEntity(tableService, tableName, newEntity);
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    done();
+                });
+        });
+    });
     
     // Test for updateEntity with simple syntax
+    describe("When updating an entity with simple syntax", function() {
+        it ('it should return a MyCustomField value of checkmate.', function(done) {
+            var rowKey = "10";
+            var partitionKey = "testPartition";
+            createEntity(rowKey)
+                .then(function(response) {
+                    var newEntity = response.entity;
+                    newEntity.MyCustomField = "checkmate";
+                    return fog.updateEntity({"tableName" : tableName, "entity" : newEntity});
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    return fog.queryEntity({
+                            "tableName" : tableName, 
+                            "entityDescriptor": {  
+                                    "PartitionKey" : partitionKey,
+                                    "RowKey" : rowKey,
+                                }
+                            });
+                }).then(function(response) {
+                    assert.equal(response.entity.MyCustomField, "checkmate");
+                    done();
+                });
+        });
+    });
     
     // Test for mergeEntity with promise
     
