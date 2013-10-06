@@ -16,7 +16,7 @@ Syntax
 
 Thanks to Q.js, you can use the typical API methods while also avoiding nested callbacks. Here's a quick example:
 
-    var fogBlob = require("../src/blobStorage.js");
+    var fogBlob = require("../src/fogBlobStorage.js");
     var azure = require('azure');
     var blobService = azure.createBlobService();
     var containerName = "testcontainer";
@@ -34,7 +34,7 @@ Thanks to Q.js, you can use the typical API methods while also avoiding nested c
 You can simplify things even more by taking advantage of convention to eliminate the need to create a blobServer and create the container.
 This allows the previous example to be condensed to this:
 
-    var fogBlob = require("../src/blobStorage.js"); 
+    var fogBlob = require("../src/fogBlobStorage.js"); 
 
     var containerName = "testcontainer";
     fogBlob.createBlockBlobFromText({
@@ -45,7 +45,7 @@ This allows the previous example to be condensed to this:
 
 Here's an example of chaining together a create, followed by a get, followed by a delete. 
 
-    var fogBlob = require("../src/blobStorage.js"); 
+    var fogBlob = require("../src/fogBlobStorage.js"); 
 
     var containerName = "testcontainer";
     var blobName = "testblob";
@@ -73,7 +73,7 @@ Here's an example of chaining together a create, followed by a get, followed by 
 
 Table Storage has features simpler to those already described for Blob Storage. The simple syntax looks like this:
 
-    var fog = require("../src/tableStorage.js");
+    var fog = require("../src/fogTableStorage.js");
 
     var testTableName = "testTableName";
     var rowKey = "myRowKey";
@@ -100,10 +100,6 @@ Table Storage has features simpler to those already described for Blob Storage. 
 Coming soon...
 
 **Service Bus**
-
-Coming soon...
-
-**Caching**
 
 Coming soon...
 

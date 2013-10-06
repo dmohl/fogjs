@@ -1,6 +1,5 @@
 var q = require("q");
 var azure = require("azure");
-var util = require("util");
 
 var exports = {};
 

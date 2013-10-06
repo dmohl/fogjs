@@ -1,5 +1,5 @@
 var assert = require("assert");
-var fogBlob = require("../src/blobStorage.js");
+var fogBlob = require("../src/fogBlobStorage.js");
 var azure = require('azure');
 var fs = require('fs');
 var blobService = azure.createBlobService();
@@ -251,6 +251,13 @@ describe("BlobStorage", function() {
                     done();
                 });
             });
+        });
+    });    
+    
+    describe("When attempting to create an invalid container", function() {
+        this.timeout("10000");
+        it ('it should fail.', function(done) {
+            assert.fail("NOT YET IMPLEMENTED");
         });
     });    
 });    
