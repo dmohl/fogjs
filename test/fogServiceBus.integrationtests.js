@@ -25,5 +25,50 @@ describe("Service Bus Tests", function() {
         });
     });    
     
-    // Create queue with simple syntax
+    // Create queue with alternate syntax
+    describe("When creating a queue with alternate syntax", function() {
+        it ('it should return success.', function(done) {
+            var queueName2 = "testName2";
+            fog.createQueueIfNotExists({"queuePath" : queueName2})
+                .then(function(response) {
+                    assert.equal(response.queueCreated, true);
+                    fog.deleteQueue(serviceBus, queueName2);
+                    done();
+                });
+        });
+    });   
+
+    // Send a message to a valid queue with a promise.
+    describe("When sending a message to a queue with promises", function() {
+        it ('it should not throw an error.', function(done) {
+            fog.createQueueIfNotExists(serviceBus, queueName)
+            .then(function(response) {
+                return fog.sendQueueMessage(serviceBus, queueName, "Test Message");
+            }).then(function() {
+                done();
+            });
+        });
+    });    
+
+    // Send a message to an invalid queue with a promise.
+    describe("When sending a message to an invalid queue with promises", function() {
+        it ('it should throw an error.', function(done) {
+            fog.sendQueueMessage(serviceBus, "InvalidQueue", "Test Message")
+            .catch(function(response) {
+                done();
+            });
+        });
+    });    
+
+    // Send a message to a valid queue with simple syntax.
+    describe("When sending a message to a queue with simple syntax", function() {
+        it ('it should not throw an error.', function(done) {
+            fog.createQueueIfNotExists({"queuePath" : queueName})
+            .then(function(response) {
+                return fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
+            }).then(function() {
+                done();
+            });
+        });
+    });    
 });
