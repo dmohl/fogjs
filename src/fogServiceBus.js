@@ -7,7 +7,7 @@ var defaultServiceBus = azure.createServiceBusService();
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
-// If no error message is returned, then an object literal that contains created and response is returned. 
+// If no error message is returned, then an object literal that contains queueCreated and response is returned. 
 // As with the Azure API function, `queueCreated` will contain a boolean to indicate success and
 // `response` will be returned containing information related to the operation.
 exports.createQueueIfNotExists = function (serviceBusOrAllParams, queuePath, options) {
@@ -45,7 +45,7 @@ exports.createQueueIfNotExists = function (serviceBusOrAllParams, queuePath, opt
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
-// If there is not an error, `successful` will be true and `response` will be returned containing information related to the operation.
+// If there is not an error, `response` will be returned containing information related to the operation.
 exports.deleteQueue = function (serviceBus, queuePath, options) {
     var deferred = q.defer();
     var callback = function(error, response) {
@@ -67,13 +67,12 @@ exports.deleteQueue = function (serviceBus, queuePath, options) {
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
-// If no error message is returned, then an object literal that contains entity and response is returned. 
+// If no error message is returned, then an object literal that contains response is returned. 
 // As with the Azure API function `response` will be returned containing information related to the operation.
 exports.sendQueueMessage = function (serviceBusOrAllParams, queuePath, message, options) {
     var deferred = q.defer();
-    var callback = function(error, entity, response) {
+    var callback = function(error, response) {
         if (error) {
-            console.log("here");
             deferred.reject(new Error(error));
         } else {
             deferred.resolve(response);
@@ -98,6 +97,46 @@ exports.sendQueueMessage = function (serviceBusOrAllParams, queuePath, message, 
             });
     } else {
         sendTheMessage(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains receivedMessage and response is returned. 
+// As with the Azure API function `receivedMessage` is the message and `response` will be returned containing information related to the operation.
+exports.receiveQueueMessage = function (serviceBusOrAllParams, queuePath, options) {
+    var deferred = q.defer();
+    var callback = function(error, receivedMessage, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            var result = {
+                "receivedMessage" : receivedMessage,
+                "response" : response
+            };
+            deferred.resolve(result);
+        }
+    };
+
+    var receiveTheMessage = function(serviceBus) {
+        if (options) {
+            serviceBus.receiveQueueMessage(queuePath, options, callback);
+        } else {
+            serviceBus.receiveQueueMessage(queuePath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.queuePath) {
+        queuePath = serviceBusOrAllParams.queuePath;
+        options = serviceBusOrAllParams.options;
+        exports.createQueueIfNotExists(defaultServiceBus, queuePath)
+            .then(function() {
+                receiveTheMessage(defaultServiceBus);
+            });
+    } else {
+        receiveTheMessage(serviceBusOrAllParams);
     }    
     
     return deferred.promise; 

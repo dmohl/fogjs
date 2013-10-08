@@ -40,6 +40,7 @@ describe("Service Bus Tests", function() {
 
     // Send a message to a valid queue with a promise.
     describe("When sending a message to a queue with promises", function() {
+        this.timeout(20000);
         it ('it should not throw an error.', function(done) {
             fog.createQueueIfNotExists(serviceBus, queueName)
             .then(function(response) {
@@ -63,12 +64,36 @@ describe("Service Bus Tests", function() {
     // Send a message to a valid queue with simple syntax.
     describe("When sending a message to a queue with simple syntax", function() {
         it ('it should not throw an error.', function(done) {
-            fog.createQueueIfNotExists({"queuePath" : queueName})
-            .then(function(response) {
-                return fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
-            }).then(function() {
+            fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"})
+            .then(function() {
                 done();
             });
         });
     });    
+
+    describe("When receiving a message from a queue with a promise", function() {
+        it ('it should get the message "Test Message"', function(done) {
+            fog.createQueueIfNotExists({"queuePath" : queueName})
+            .then(function(response) {
+                return fog.receiveQueueMessage(serviceBus, queueName);
+            }).then(function(response) {
+                assert.equal(response.receivedMessage.body, "Test Message");
+                done();
+            });
+            
+            fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
+        });
+    });      
+    
+    describe("When receiving a message from a queue with simple syntax", function() {
+        it ('it should get the message "Test Message"', function(done) {
+            fog.receiveQueueMessage({"queuePath": queueName})
+            .then(function(response) {
+                assert.equal(response.receivedMessage.body, "Test Message");
+                done();
+            });
+            
+            fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
+        });
+    });      
 });
