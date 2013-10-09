@@ -3,6 +3,8 @@ var fog = require("../src/fogServiceBus.js");
 var azure = require("azure");
 var serviceBus = azure.createServiceBusService();
 var queueName = "testQueue";
+var topicName = "testTopic";
+var subscriptionPath = "testSubPath";
 
 describe("Service Bus Tests", function() {
     this.timeout(10000);
@@ -12,6 +14,7 @@ describe("Service Bus Tests", function() {
             .then(function(response) {
                 done();
             });
+        fog.deleteTopic(serviceBus, topicName);    
     });
    
     // Create queue with a promise.
@@ -94,6 +97,54 @@ describe("Service Bus Tests", function() {
             });
             
             fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
+        });
+    });      
+    
+    // Create topic with a promise.
+    describe("When creating a topic with promises", function() {
+        it ('it should return success.', function(done) {
+            fog.createTopicIfNotExists(serviceBus, topicName)
+                .then(function(response) {
+                    assert.equal(response.topicCreated, true);
+                    done();
+                });
+        });
+    });    
+    
+    // Create topic with alternate syntax
+    describe("When creating a topic with alternate syntax", function() {
+        it ('it should return success.', function(done) {
+            var topicName2 = "testTopic2";
+            fog.createTopicIfNotExists({"topic" : topicName2})
+                .then(function(response) {
+                    assert.equal(response.topicCreated, true);
+                    fog.deleteTopic(serviceBus, topicName2);
+                    done();
+                });
+        });
+    });       
+    
+    // Create subscription with promises
+    describe("When subscribing to a topic with a promise", function() {
+        it ('it should return new topic information.', function(done) {
+            fog.createTopicIfNotExists({"topic" : topicName})
+            .then(function(response) {
+                return fog.createSubscription(serviceBus, topicName, subscriptionPath);
+            }).then(function(response) {
+                assert(response.createSubscriptionResult);
+                done();
+            });
+        });
+    });      
+        
+    // Create subscription with simple syntax
+    describe("When subscribing to a topic with simple syntax", function() {
+        it ('it should return new topic information.', function(done) {
+            fog.createSubscription({ "topicPath" : topicName, "subscriptionPath" : "testSub2"})
+            .then(function(response) {
+                assert(response.createSubscriptionResult);
+                done();
+            });
         });
     });      
 });
