@@ -600,6 +600,43 @@ exports.createSubscription = function (serviceBusOrAllParams, topicPath, subscri
     return deferred.promise; 
 };
 
+// This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then an object literal that contains response is returned. 
+// As with the Azure API function `response` will be returned containing information related to the operation.
+exports.deleteSubscription = function (serviceBusOrAllParams, topicPath, subscriptionPath, options) {
+    var deferred = q.defer();
+    var callback = function(error, response) {
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {
+            deferred.resolve(response);
+        }
+    };
+
+    var deleteTheSubscription = function(serviceBus) {
+        if (options) {
+            serviceBus.deleteSubscription(topicPath, subscriptionPath, options, callback);
+        } else {
+            serviceBus.deleteSubscription(topicPath, subscriptionPath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.topicPath) {
+        topicPath = serviceBusOrAllParams.topicPath;
+        subscriptionPath = serviceBusOrAllParams.subscriptionPath;
+        options = serviceBusOrAllParams.options;
+        exports.createSubscription(serviceBusOrAllParams)
+        .then(function() {
+            deleteTheSubscription(defaultServiceBus);
+        });
+    } else {
+        deleteTheSubscription(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;
 ;var q = require("q");
 var azure = require("azure");

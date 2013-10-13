@@ -147,4 +147,79 @@ describe("Service Bus Tests", function() {
             });
         });
     });      
+    
+    // Delete subscription with promise
+    describe("When deleting a subscription with promises", function() {
+        it ('it should not fail.', function(done) {
+            fog.createSubscription({ "topicPath" : topicName, "subscriptionPath" : "testSub3"})
+            .then(function(response) {
+                return fog.deleteSubscription(serviceBus, topicName, subscriptionPath);
+            }).then( function(response) {
+                done();
+            });
+        });
+    });      
+    
+    // Delete subscription with simple syntax
+    describe("When deleting a subscription with simple syntax", function() {
+        this.timeout(20000);
+        it ('it should not fail.', function(done) {
+            fog.deleteSubscription({ "topicPath" : topicName, "subscriptionPath" : "testSub4"})
+            .then( function(response) {
+                done();
+            });
+        });
+    });      
+    
+    // Send and receive a topic message with promise
+    
+    // Send and receive a topic message with simple syntax
+        
+    // Delete message with promise
+    
+    // Delete message with alternate syntax
+    
+    // Unlock message with promise
+    
+    // Unlock message with alternate syntax
+
+    // get queue with promise
+    
+    // get queue with alternate syntax
+    
+    // list queues with promise
+    
+    // list queues with alternate syntax
+    
+    // get topic with promise
+    
+    // get topic with alternate syntax
+    
+    // list topics with promise
+    
+    // list topics with alternate syntax
+    
+    // get subscription with promise
+    
+    // get subscription with alternate syntax
+    
+    // list subscription with promise
+    
+    // list subscription with alternate syntax
+    
+    // create, get, and delete rule with promise
+    
+    // create, get, and delete rule with alternate syntax
+    
+    // list rules with promise
+    
+    // list rules with alternate syntax
+
+    // create, get, and delete notification hub with promise
+    
+    // create, get, and delete notification hub with alternate syntax
+    
+    // list notification hub rules with promise
+    
+    // list notification hub with alternate syntax
 });
