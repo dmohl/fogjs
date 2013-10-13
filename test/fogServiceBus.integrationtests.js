@@ -170,11 +170,35 @@ describe("Service Bus Tests", function() {
             });
         });
     });      
-    
-    // Send and receive a topic message with promise
-    
-    // Send and receive a topic message with simple syntax
         
+    // Sending a topic message with promise
+    describe("When sending a topic message with promises", function() {
+        it ('it should have a receivetopicmessageresult that has some value.', function(done) {
+            fog.createTopicIfNotExists({"topic" : topicName})
+            .then( function() { 
+                return fog.sendTopicMessage(serviceBus, topicName, "message 1"); 
+            }).then( function(response) {
+                assert(response.receiveTopicMessageResult);
+                done();
+            });
+        });
+    });      
+    
+    // Sending a topic message with simple syntax
+    describe("When sending a topic message with promises", function() {
+        it ('it should have a receivetopicmessageresult that has some value.', function(done) {
+            fog.sendTopicMessage({ "topicPath" : topicName, "message" : "message 2"}) 
+            .then( function(response) {
+                assert(response.receiveTopicMessageResult);
+                done();
+            });
+        });
+    });      
+    
+    // Receiving a subscription message with promise
+    
+    // Receiving a subscription message with simple syntax
+    
     // Delete message with promise
     
     // Delete message with alternate syntax
