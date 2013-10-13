@@ -9,6 +9,11 @@ var subscriptionPath = "testSubPath";
 describe("Service Bus Tests", function() {
     this.timeout(10000);
 
+    var handleError = function(error) {
+        console.log(error);
+        assert(!error, error);
+    };
+ 
     after(function(done) {
         fog.deleteQueue(serviceBus, queueName)
             .then(function(response) {
@@ -66,6 +71,7 @@ describe("Service Bus Tests", function() {
 
     // Send a message to a valid queue with simple syntax.
     describe("When sending a message to a queue with simple syntax", function() {
+        this.timeout(15000);
         it ('it should not throw an error.', function(done) {
             fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"})
             .then(function() {
@@ -102,6 +108,7 @@ describe("Service Bus Tests", function() {
     
     // Create topic with a promise.
     describe("When creating a topic with promises", function() {
+        this.timeout(15000);
         it ('it should return success.', function(done) {
             fog.createTopicIfNotExists(serviceBus, topicName)
                 .then(function(response) {
@@ -115,7 +122,7 @@ describe("Service Bus Tests", function() {
     describe("When creating a topic with alternate syntax", function() {
         it ('it should return success.', function(done) {
             var topicName2 = "testTopic2";
-            fog.createTopicIfNotExists({"topic" : topicName2})
+            fog.createTopicIfNotExists({"topicPath" : topicName2})
                 .then(function(response) {
                     assert.equal(response.topicCreated, true);
                     fog.deleteTopic(serviceBus, topicName2);
@@ -127,7 +134,7 @@ describe("Service Bus Tests", function() {
     // Create subscription with promises
     describe("When subscribing to a topic with a promise", function() {
         it ('it should return new topic information.', function(done) {
-            fog.createTopicIfNotExists({"topic" : topicName})
+            fog.createTopicIfNotExists({"topicPath" : topicName})
             .then(function(response) {
                 return fog.createSubscription(serviceBus, topicName, subscriptionPath);
             }).then(function(response) {
@@ -173,8 +180,9 @@ describe("Service Bus Tests", function() {
         
     // Sending a topic message with promise
     describe("When sending a topic message with promises", function() {
+        this.timeout(15000);
         it ('it should have a receivetopicmessageresult that has some value.', function(done) {
-            fog.createTopicIfNotExists({"topic" : topicName})
+            fog.createTopicIfNotExists({"topicPath" : topicName})
             .then( function() { 
                 return fog.sendTopicMessage(serviceBus, topicName, "message 1"); 
             }).then( function(response) {
@@ -185,7 +193,7 @@ describe("Service Bus Tests", function() {
     });      
     
     // Sending a topic message with simple syntax
-    describe("When sending a topic message with promises", function() {
+    describe("When sending a topic message with simple syntax", function() {
         it ('it should have a receivetopicmessageresult that has some value.', function(done) {
             fog.sendTopicMessage({ "topicPath" : topicName, "message" : "message 2"}) 
             .then( function(response) {
@@ -196,8 +204,41 @@ describe("Service Bus Tests", function() {
     });      
     
     // Receiving a subscription message with promise
+    describe("When receiving a message with promises", function() {
+        this.timeout(20000);
+        it ('it should have a body in the receivetopicmessageresult with a value of "message 2".', function(done) {
+            var subscription = "testSub1.1";
+            fog.createSubscription({ "topicPath" : topicName, "subscriptionPath" : subscription})            
+            .then(function() {
+                return fog.sendTopicMessage(serviceBus, topicName, "message 2");
+            }).then(function() {
+                return fog.receiveSubscriptionMessage(serviceBus, topicName, subscription);
+            }).then(function(response) {
+                assert.equal(response.receiveTopicMessageResult.body, "message 2");
+                fog.deleteSubscription({ "topicPath" : topicName, "subscriptionPath" : subscription});
+                done();
+            }).fail(handleError);
+        });
+    });   
     
-    // Receiving a subscription message with simple syntax
+    // Receiving a subscription message with alternate syntax
+    describe("When receiving a message with alternate syntax", function() {
+        this.timeout(20000);
+        it ('it should have a body in the receivetopicmessageresult with a value of "message 2".', function(done) {
+            var subscription = "testSub1.2";
+            fog.createSubscription({ "topicPath" : topicName, "subscriptionPath" : subscription})            
+            .then(function() {
+                return fog.sendTopicMessage({ "topicPath" : topicName, "message" : "message 2"});
+            }).then(function() {
+                fog.receiveSubscriptionMessage({ "topicPath": topicName, "subscriptionPath" : subscription})
+                .then( function(response) {
+                    assert.equal(response.receiveTopicMessageResult.body, "message 2");
+                    fog.deleteSubscription({ "topicPath" : topicName, "subscriptionPath" : subscription});
+                    done();
+                }).fail(handleError);
+            });
+        });
+    });   
     
     // Delete message with promise
     
