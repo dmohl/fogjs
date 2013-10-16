@@ -241,12 +241,36 @@ describe("Service Bus Tests", function() {
     });   
     
     // Delete message with promise
+    describe("When deleting a message with promise", function() {
+        it ('it should not throw an exception', function(done) {
+            var queueNameTest = "myTestQueuePath1";
+            fog.receiveQueueMessage({"queuePath": queueNameTest, "options" : { isPeekLock: true, timeoutIntervalInS: 5 }})
+            .then(function(response) {
+                return fog.deleteMessage(serviceBus, response.receivedMessage);
+            }).then(function(reponse) {
+                done();
+            }).fail(handleError);
+            
+            fog.sendQueueMessage({ "queuePath" : queueNameTest, "message" : "Test Message"});
+        });
+    });
     
     // Delete message with alternate syntax
-    
+    describe("When deleting a message with alternate syntax", function() {
+        it ('it should not throw an exception', function(done) {
+            var queueNameTest2 = "myTestQueuePath2";
+            fog.receiveQueueMessage({"queuePath": queueNameTest2, "options" : { isPeekLock: true, timeoutIntervalInS: 5 }})
+            .then(function(response) {
+                return fog.deleteMessage({"message" : response.receivedMessage});
+            }).then(function(reponse) {
+                done();
+            }).fail(handleError);
+            
+            fog.sendQueueMessage({ "queuePath" : queueNameTest2, "message" : "Test Message"});
+        });
+    });
+
     // Unlock message with promise
-    
-    // Unlock message with alternate syntax
 
     // get queue with promise
     

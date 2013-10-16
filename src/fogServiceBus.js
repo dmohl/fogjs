@@ -342,9 +342,9 @@ exports.receiveSubscriptionMessage = function (serviceBusOrAllParams, topicPath,
 
     var receiveTheSubscriptionMessage = function(serviceBus) {
         if (options) {
-            serviceBus.receiveSubscriptionMessage(topicPath, subscriptionPath, callback);
+            serviceBus.receiveSubscriptionMessage(topicPath, subscriptionPath, options, callback);            
         } else {                    
-            serviceBus.receiveSubscriptionMessage(topicPath, subscriptionPath, options, callback);
+            serviceBus.receiveSubscriptionMessage(topicPath, subscriptionPath, callback);
         }
     };
     
@@ -355,6 +355,38 @@ exports.receiveSubscriptionMessage = function (serviceBusOrAllParams, topicPath,
         receiveTheSubscriptionMessage(defaultServiceBus);
     } else {
         receiveTheSubscriptionMessage(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a response is returned. 
+exports.deleteMessage = function (serviceBusOrAllParams, message, options) {
+    var deferred = q.defer();
+    var callback = function(error, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                        
+            deferred.resolve(response);
+        }
+    };
+
+    var deleteTheMessage = function(serviceBus) {
+        if (options) {
+            serviceBus.deleteMessage(message, options, callback);            
+        } else {                    
+            serviceBus.deleteMessage(message, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.message) {
+        message = serviceBusOrAllParams.message;
+        options = serviceBusOrAllParams.options;
+        deleteTheMessage(defaultServiceBus);
+    } else {
+        deleteTheMessage(serviceBusOrAllParams);
     }    
     
     return deferred.promise; 
