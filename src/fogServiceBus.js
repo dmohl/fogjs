@@ -392,4 +392,36 @@ exports.deleteMessage = function (serviceBusOrAllParams, message, options) {
     return deferred.promise; 
 };
 
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a response is returned. 
+exports.unlockMessage = function (serviceBusOrAllParams, message, options) {
+    var deferred = q.defer();
+    var callback = function(error, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                        
+            deferred.resolve(response);
+        }
+    };
+
+    var unlockTheMessage = function(serviceBus) {
+        if (options) {
+            serviceBus.unlockMessage(message, options, callback);            
+        } else {                    
+            serviceBus.unlockMessage(message, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.message) {
+        message = serviceBusOrAllParams.message;
+        options = serviceBusOrAllParams.options;
+        unlockTheMessage(defaultServiceBus);
+    } else {
+        unlockTheMessage(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;
