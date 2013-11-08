@@ -26,8 +26,7 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        //src: ['test/**/*.js']
-        src: ['test/**/fogServiceBus.integrationtests.js']
+        src: ['test/**/*.js']
       }
     },
     jshint: {

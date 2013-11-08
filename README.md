@@ -5,8 +5,8 @@ FogJS
 
 **FogJS** brings the cloud down to earth by adding a few features and abstractions to the Node.js Windows Azure API.
 
-Building Azure apps with FogJS that need to interact with Azure Table Storage, Blob Storage, Queue Storage, Caching, and/or the Service Bus is very easy. 
-The examples that follow use this approach. Fog also provides more fine-grained interaction if that is desired, but adds a few features such as promises. 
+Building Azure apps with FogJS that need to interact with Azure Table Storage, Blob Storage, and the Service Bus is very easy. 
+The examples that follow use this approach. Fog also provides more fine-grained interaction if that is desired, but adds a few features such as promises (with the help of Q.js, which is also under an MIT license). 
 See the integration tests for examples.
 
 Syntax
@@ -71,7 +71,7 @@ Here's an example of chaining together a create, followed by a get, followed by 
 
 **Table Storage**
 
-Table Storage has features simpler to those already described for Blob Storage. The simple syntax looks like this:
+Table Storage has features similer to those already described for Blob Storage. The simple syntax looks like this:
 
     var fog = require("../src/fogTableStorage.js");
 
@@ -95,21 +95,33 @@ Table Storage has features simpler to those already described for Blob Storage. 
         });
     });
             
-**Queue Storage**
-
-Coming soon...
-
 **Service Bus**
 
-Coming soon...
+Interacting with the Azure Service Bus via Fog.js is a snap. In addition to providing versions of each function that return promises, the service bus API allows you to publish or 
+recieve message without having to first create the queues. Using topics and subscriptions is also very easy. 
+
+Here's an example:
+
+    var fog = require("../src/fogTableStorage.js");
+    
+    var queueName = "testQueue";
+    
+    fog.receiveQueueMessage({"queuePath": queueName})
+    .then(function(response) {
+        // Do what you wish with the message body by accessing: response.receivedMessage.body
+    });
+    
+    fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
+
 
 How To Get It
 =======
 
-Fog will be available via NPM once it's released.
+You can get Fog.js from NPM as package ID <REPLACE>
 
 Releases
 =======
+* 0.3.0 - Alpha release.
 * 0.0.1 - Fog is not yet released.
 
 MIT License
