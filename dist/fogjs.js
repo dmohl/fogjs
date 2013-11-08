@@ -781,6 +781,42 @@ exports.unlockMessage = function (serviceBusOrAllParams, message, options) {
     return deferred.promise; 
 };
 
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a getQueueResult and a response is returned. 
+exports.getQueue = function (serviceBusOrAllParams, queuePath, options) {
+    var deferred = q.defer();
+    var callback = function(error, getQueueResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "getQueueResult" : getQueueResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var getTheQueue = function(serviceBus) {
+        if (options) {
+            serviceBus.getQueue(queuePath, options, callback);            
+        } else {                    
+            serviceBus.getQueue(queuePath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.queuePath) {
+        queuePath = serviceBusOrAllParams.queuePath;
+        options = serviceBusOrAllParams.options;
+        getTheQueue(defaultServiceBus);
+    } else {
+        getTheQueue(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;
 ;var q = require("q");
 var azure = require("azure");

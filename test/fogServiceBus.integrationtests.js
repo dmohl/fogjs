@@ -301,9 +301,29 @@ describe("Service Bus Tests", function() {
     });
 
     // get queue with promise
+    describe("When getting a queue with promise", function() {
+        it ('it should have a queue result', function(done) {
+            fog.createQueueIfNotExists(serviceBus, queueName)
+            .then(function(response) {
+                return fog.getQueue(serviceBus, queueName);
+            }).then(function(response) {
+                assert(response.getQueueResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
-    // get queue with alternate syntax
-    
+    // get queue with simple syntax    
+    describe("When getting a queue with simple syntax", function() {
+        it ('it should have a queue result', function(done) {
+            fog.getQueue({"queuePath" : queueName})
+            .then(function(response) {
+                assert(response.getQueueResult);
+                done();
+            }).fail(handleError);
+        });
+    });
+
     // list queues with promise
     
     // list queues with alternate syntax
