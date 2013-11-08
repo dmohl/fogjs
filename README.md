@@ -16,7 +16,8 @@ Syntax
 
 Thanks to Q.js, you can use the typical API methods while also avoiding nested callbacks. Here's a quick example:
 
-    var fogBlob = require("../src/fogBlobStorage.js");
+    var fog = require("fogjs"); 
+    var fogBlob = fog.blobStorage;
     var azure = require('azure');
     var blobService = azure.createBlobService();
     var containerName = "testcontainer";
@@ -34,7 +35,8 @@ Thanks to Q.js, you can use the typical API methods while also avoiding nested c
 You can simplify things even more by taking advantage of convention to eliminate the need to create a blobServer and create the container.
 This allows the previous example to be condensed to this:
 
-    var fogBlob = require("../src/fogBlobStorage.js"); 
+    var fog = require("fogjs"); 
+    var fogBlob = fog.blobStorage;
 
     var containerName = "testcontainer";
     fogBlob.createBlockBlobFromText({
@@ -45,8 +47,9 @@ This allows the previous example to be condensed to this:
 
 Here's an example of chaining together a create, followed by a get, followed by a delete. 
 
-    var fogBlob = require("../src/fogBlobStorage.js"); 
-
+    var fog = require("fogjs"); 
+    var fogBlob = fog.blobStorage;
+    
     var containerName = "testcontainer";
     var blobName = "testblob";
     
@@ -73,7 +76,8 @@ Here's an example of chaining together a create, followed by a get, followed by 
 
 Table Storage has features similer to those already described for Blob Storage. The simple syntax looks like this:
 
-    var fog = require("../src/fogTableStorage.js");
+    var fogjs = require("fogjs"); 
+    var fog = fogjs.tableStorage;
 
     var testTableName = "testTableName";
     var rowKey = "myRowKey";
@@ -102,13 +106,14 @@ recieve message without having to first create the queues. Using topics and subs
 
 Here's an example:
 
-    var fog = require("../src/fogTableStorage.js");
+    var fogjs = require("fogjs"); 
+    var fog = fogjs.serviceBus;
     
     var queueName = "testQueue";
     
     fog.receiveQueueMessage({"queuePath": queueName})
     .then(function(response) {
-        // Do what you wish with the message body by accessing: response.receivedMessage.body
+        console.log(response.receivedMessage.body);
     });
     
     fog.sendQueueMessage({ "queuePath" : queueName, "message" : "Test Message"});
