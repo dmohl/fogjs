@@ -11,14 +11,10 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-      },
-      dist: {
-        files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-        }
+    minified : {
+      files: {
+        src: ['src/**/*.js'],
+        dest: 'dist/'
       }
     },
 	mochaTest: {
@@ -47,14 +43,12 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-minified');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('test', ['jshint', 'mochaTest']);
-
-  grunt.registerTask('default', ['jshint', 'mochaTest', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'minified', 'mochaTest']);
 
 };

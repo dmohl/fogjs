@@ -1,5 +1,6 @@
 var assert = require("assert");
-var fog = require("../src/fogServiceBus.js");
+var fogjs = require("../dist/fog");
+var fog = fogjs.serviceBus;
 var azure = require("azure");
 var serviceBus = azure.createServiceBusService();
 var queueName = "testQueue";
