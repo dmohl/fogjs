@@ -463,4 +463,41 @@ exports.getQueue = function (serviceBusOrAllParams, queuePath, options) {
     return deferred.promise; 
 };
 
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a listQueuesResult and a response is returned. 
+exports.listQueues = function (serviceBusOrAllParams, options) {
+    var deferred = q.defer();
+    var callback = function(error, listQueuesResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "listQueuesResult" : listQueuesResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var listTheQueues = function(serviceBus) {
+        if (options) {
+            serviceBus.listQueues(options, callback);            
+        } else {                    
+            serviceBus.listQueues(callback);
+        }
+    };
+    
+    if (!serviceBusOrAllParams || (serviceBusOrAllParams && serviceBusOrAllParams.options)) {
+        if (serviceBusOrAllParams && serviceBusOrAllParams.options) {
+            options = serviceBusOrAllParams.options;
+        }
+        listTheQueues(defaultServiceBus);
+    } else {
+        listTheQueues(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

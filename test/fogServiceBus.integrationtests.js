@@ -325,8 +325,26 @@ describe("Service Bus Tests", function() {
     });
 
     // list queues with promise
+    describe("When listing queues with promise", function() {
+        it ('it should have a queue list as a result', function(done) {
+            fog.listQueues(serviceBus)
+            .then(function(response) {
+                assert(response.listQueuesResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // list queues with alternate syntax
+    describe("When listing queues with alternate syntax", function() {
+        it ('it should have a queue list as a result', function(done) {
+            fog.listQueues()
+            .then(function(response) {
+                assert(response.listQueuesResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // get topic with promise
     
@@ -344,19 +362,4 @@ describe("Service Bus Tests", function() {
     
     // list subscription with alternate syntax
     
-    // create, get, and delete rule with promise
-    
-    // create, get, and delete rule with alternate syntax
-    
-    // list rules with promise
-    
-    // list rules with alternate syntax
-
-    // create, get, and delete notification hub with promise
-    
-    // create, get, and delete notification hub with alternate syntax
-    
-    // list notification hub rules with promise
-    
-    // list notification hub with alternate syntax
 });
