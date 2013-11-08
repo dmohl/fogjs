@@ -3,7 +3,7 @@
   "author": {
     "name": "Daniel Mohl"
   },  
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "FogJS brings the cloud down to earth by providing abstraction that make it easier to interact with the Azure APIs in Node.js applications.",
   "tags": [
     "azure",
@@ -26,6 +26,10 @@
     "grunt-contrib-uglify": "~0.2.2",
 	"grunt-minified": "~0.0.6",
 	"grunt-contrib-watch": "~0.5.3",
+	"q": "~0.9.7",
+	"azure": "~0.7.15"
+  },
+  "dependencies": {
 	"q": "~0.9.7",
 	"azure": "~0.7.15"
   }
