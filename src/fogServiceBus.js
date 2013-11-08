@@ -500,4 +500,159 @@ exports.listQueues = function (serviceBusOrAllParams, options) {
     return deferred.promise; 
 };
 
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a getTopicResult and a response is returned. 
+exports.getTopic = function (serviceBusOrAllParams, topicPath, options) {
+    var deferred = q.defer();
+    var callback = function(error, getTopicResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "getTopicResult" : getTopicResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var getTheTopic = function(serviceBus) {
+        if (options) {
+            serviceBus.getTopic(topicPath, options, callback);            
+        } else {                    
+            serviceBus.getTopic(topicPath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.topicPath) {
+        topicPath = serviceBusOrAllParams.topicPath;
+        options = serviceBusOrAllParams.options;
+        exports.createTopicIfNotExists(serviceBusOrAllParams)
+        .then(function() {
+            getTheTopic(defaultServiceBus);
+        });    
+    } else {
+        getTheTopic(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a listTopicsResult and a response is returned. 
+exports.listTopics = function (serviceBusOrAllParams, options) {
+    var deferred = q.defer();
+    var callback = function(error, listTopicsResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "listTopicsResult" : listTopicsResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var listTheTopics = function(serviceBus) {
+        if (options) {
+            serviceBus.listTopics(options, callback);            
+        } else {                    
+            serviceBus.listTopics(callback);
+        }
+    };
+    
+    if (!serviceBusOrAllParams || (serviceBusOrAllParams && serviceBusOrAllParams.options)) {
+        if (serviceBusOrAllParams && serviceBusOrAllParams.options) {
+            options = serviceBusOrAllParams.options;
+        }
+        listTheTopics(defaultServiceBus);
+    } else {
+        listTheTopics(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a getSubscriptionResult and a response is returned. 
+exports.getSubscription = function (serviceBusOrAllParams, topicPath, subscriptionPath, options) {
+    var deferred = q.defer();
+    var callback = function(error, getSubscriptionResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "getSubscriptionResult" : getSubscriptionResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var getTheSubscription = function(serviceBus) {
+        if (options) {
+            serviceBus.getSubscription(topicPath, subscriptionPath, options, callback);            
+        } else {                    
+            serviceBus.getSubscription(topicPath, subscriptionPath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.topicPath) {
+        topicPath = serviceBusOrAllParams.topicPath;
+        subscriptionPath = serviceBusOrAllParams.subscriptionPath;
+        options = serviceBusOrAllParams.options;
+        exports.createTopicIfNotExists(serviceBusOrAllParams)
+        .then(function() {
+            getTheSubscription(defaultServiceBus);
+        });    
+    } else {
+        getTheSubscription(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
+// This is similar to the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
+// If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
+// If no error message is returned, then a listSubscriptionsResult and a response is returned. 
+exports.listSubscriptions = function (serviceBusOrAllParams, topicPath, options) {
+    var deferred = q.defer();
+    var callback = function(error, listSubscriptionsResult, response) {        
+        if (error) {
+            deferred.reject(new Error(error));
+        } else {                       
+            var result = {
+                "listSubscriptionsResult" : listSubscriptionsResult,
+                "response" : response
+            }; 
+            deferred.resolve(result);
+        }
+    };
+
+    var listTheSubscriptions = function(serviceBus) {
+        if (options) {
+            serviceBus.listSubscriptions(topicPath, options, callback);            
+        } else {                    
+            serviceBus.listSubscriptions(topicPath, callback);
+        }
+    };
+    
+    if (serviceBusOrAllParams && serviceBusOrAllParams.topicPath) {
+        options = serviceBusOrAllParams.options;
+        topicPath = serviceBusOrAllParams.topicPath;
+        exports.createTopicIfNotExists(serviceBusOrAllParams)
+        .then(function() {
+            listTheSubscriptions(defaultServiceBus);
+        });    
+    } else {
+        listTheSubscriptions(serviceBusOrAllParams);
+    }    
+    
+    return deferred.promise; 
+};
+
 module.exports = exports;

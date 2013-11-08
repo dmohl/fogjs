@@ -347,19 +347,99 @@ describe("Service Bus Tests", function() {
     });
     
     // get topic with promise
+    describe("When getting a topic with promise", function() {
+        it ('it should have a topic result', function(done) {
+            fog.createTopicIfNotExists(serviceBus, topicName)
+            .then(function(response) {
+                return fog.getTopic(serviceBus, topicName);
+            }).then(function(response) {
+                assert(response.getTopicResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // get topic with alternate syntax
+    describe("When getting a topic with simple syntax", function() {
+        it ('it should have a topic result', function(done) {
+            fog.getTopic({ "topicPath" : topicName })
+            .then(function(response) {
+                assert(response.getTopicResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // list topics with promise
+    describe("When listing topics with promise", function() {
+        it ('it should have a topic list as a result', function(done) {
+            fog.listTopics(serviceBus)
+            .then(function(response) {
+                assert(response.listTopicsResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // list topics with alternate syntax
+    describe("When listing topics with alternate syntax", function() {
+        it ('it should have a topic list as a result', function(done) {
+            fog.listTopics()
+            .then(function(response) {
+                assert(response.listTopicsResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // get subscription with promise
+    describe("When getting a subscription with promise", function() {
+        this.timeout(20000);
+        it ('it should have a subscription result', function(done) {
+            fog.createTopicIfNotExists({"topicPath" : topicName})
+            .then(function(response) {
+                return fog.createSubscription(serviceBus, topicName, subscriptionPath);
+            }).then(function(response) {
+                return fog.getSubscription(serviceBus, topicName, subscriptionPath);
+            }).then(function(response) {
+                assert(response.getSubscriptionResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
     // get subscription with alternate syntax
+    describe("When getting a subscription with simple syntax", function() {
+        this.timeout(20000);
+        it ('it should have a subscription result', function(done) {
+            fog.getSubscription({ "topicPath" : topicName, "subscriptionPath" : subscriptionPath })
+            .then(function(response) {
+                assert(response.getSubscriptionResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
-    // list subscription with promise
+    // list subscriptions with promise
+    describe("When listing subscriptions with promise", function() {
+        it ('it should have a subscription list as a result', function(done) {
+            fog.listSubscriptions(serviceBus, topicName)
+            .then(function(response) {
+                assert(response.listSubscriptionsResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
-    // list subscription with alternate syntax
+    // list subscriptions with alternate syntax
+    describe("When listing subscriptions with alternate syntax", function() {
+        it ('it should have a subscription list as a result', function(done) {
+            fog.listSubscriptions({ "topicPath" : topicName })
+            .then(function(response) {
+                assert(response.listSubscriptionsResult);
+                done();
+            }).fail(handleError);
+        });
+    });
     
 });
