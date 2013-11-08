@@ -117,11 +117,13 @@ Here's an example:
 How To Get It
 =======
 
-You can get Fog.js from NPM as package ID <REPLACE>
+You can get Fog.js from NPM as package ID ``fogjs``. Here's the command:
+
+    npm install fogjs
 
 Releases
 =======
-* 0.3.0 - Alpha release.
+* 0.3.0 - Alpha version released to NPM with support for Blob Storage, Table Storage, and Service Bus.
 * 0.0.1 - Fog is not yet released.
 
 MIT License
