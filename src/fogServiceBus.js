@@ -285,7 +285,7 @@ exports.deleteSubscription = function (serviceBusOrAllParams, topicPath, subscri
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
 // If no error message is returned, then an object literal that contains createSubscriptionResult and response is returned. 
-// As with the Azure API function `createSubscriptionResult` is the message and `response` will be returned containing information related to the operation.
+// As with the Azure API function `receiveTopicMessageResult` is the message and `response` will be returned containing information related to the operation.
 exports.sendTopicMessage = function (serviceBusOrAllParams, topicPath, message, options) {
     var deferred = q.defer();
     var callback = function(error, receivetopicmessageresult, response) {
