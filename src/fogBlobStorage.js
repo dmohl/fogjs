@@ -3,7 +3,14 @@ var azure = require('azure');
 
 var exports = {};
 
-var defaultBlobService = azure.createBlobService();
+var cachedDefaultBlobService;
+
+var defaultBlobService = function() {
+    if (!cachedDefaultBlobService) {
+        cachedDefaultBlobService = azure.createBlobService();
+    }
+    return cachedDefaultBlobService;
+};
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
@@ -65,8 +72,8 @@ exports.createBlockBlobFromText = function (blobServiceOrAllParams, container, b
         blobName = blobServiceOrAllParams.blobName;
         text = blobServiceOrAllParams.blobText;
         options = blobServiceOrAllParams.options;
-        defaultBlobService.createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
-            createTheBlob(defaultBlobService);
+        defaultBlobService().createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
+            createTheBlob(defaultBlobService());
         });
     } else {
         createTheBlob(blobServiceOrAllParams);
@@ -107,9 +114,9 @@ exports.createBlockBlobFromFile = function (blobServiceOrAllParams, container, b
         blobName = blobServiceOrAllParams.blobName;
         fileName = blobServiceOrAllParams.fileName;
         options = blobServiceOrAllParams.options;
-        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+        exports.createContainerIfNotExists(defaultBlobService(), container, {publicAccessLevel : 'blob'})
             .then(function() {
-                createTheBlob(defaultBlobService);
+                createTheBlob(defaultBlobService());
             });
     } else {
         createTheBlob(blobServiceOrAllParams);
@@ -151,9 +158,9 @@ exports.createBlockBlobFromStream = function (blobServiceOrAllParams, container,
         stream = blobServiceOrAllParams.stream;
         streamLength = blobServiceOrAllParams.streamLength;
         options = blobServiceOrAllParams.options;
-        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+        exports.createContainerIfNotExists(defaultBlobService(), container, {publicAccessLevel : 'blob'})
             .then(function() {
-                createTheBlob(defaultBlobService);
+                createTheBlob(defaultBlobService());
             });
     } else {
         createTheBlob(blobServiceOrAllParams);
@@ -216,8 +223,8 @@ exports.getBlobToText = function (blobServiceOrAllParams, container, blobName, o
         container = blobServiceOrAllParams.containerName;
         blobName = blobServiceOrAllParams.blobName;
         options = blobServiceOrAllParams.options;
-        defaultBlobService.createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
-            getTheBlob(defaultBlobService);
+        defaultBlobService().createContainerIfNotExists(container, {publicAccessLevel : 'blob'}, function (error) {
+            getTheBlob(defaultBlobService());
         });
     } else {
         getTheBlob(blobServiceOrAllParams);
@@ -258,9 +265,9 @@ exports.getBlobToFile = function (blobServiceOrAllParams, container, blobName, f
         blobName = blobServiceOrAllParams.blobName;
         fileName = blobServiceOrAllParams.fileName;
         options = blobServiceOrAllParams.options;
-        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+        exports.createContainerIfNotExists(defaultBlobService(), container, {publicAccessLevel : 'blob'})
             .then(function() {
-                getTheBlob(defaultBlobService);
+                getTheBlob(defaultBlobService());
             });
     } else {
         getTheBlob(blobServiceOrAllParams);
@@ -301,9 +308,9 @@ exports.getBlobToStream = function (blobServiceOrAllParams, container, blobName,
         blobName = blobServiceOrAllParams.blobName;
         writeStream = blobServiceOrAllParams.writeStream;
         options = blobServiceOrAllParams.options;
-        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+        exports.createContainerIfNotExists(defaultBlobService(), container, {publicAccessLevel : 'blob'})
             .then(function() {
-                getTheBlob(defaultBlobService);
+                getTheBlob(defaultBlobService());
             });
     } else {
         getTheBlob(blobServiceOrAllParams);
@@ -343,9 +350,9 @@ exports.deleteBlob = function (blobServiceOrAllParams, container, blobName, opti
         container = blobServiceOrAllParams.containerName;
         blobName = blobServiceOrAllParams.blobName;
         options = blobServiceOrAllParams.options;
-        exports.createContainerIfNotExists(defaultBlobService, container, {publicAccessLevel : 'blob'})
+        exports.createContainerIfNotExists(defaultBlobService(), container, {publicAccessLevel : 'blob'})
             .then(function() {
-                deleteTheBlob(defaultBlobService);
+                deleteTheBlob(defaultBlobService());
             });
     } else {
         deleteTheBlob(blobServiceOrAllParams);

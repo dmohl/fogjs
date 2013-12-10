@@ -3,7 +3,14 @@ var azure = require("azure");
 
 var exports = {};
 
-var defaultTableService = azure.createTableService();
+var cacheddefaultTableService;
+
+var defaultTableService = function() {
+    if (!cacheddefaultTableService) {
+        cacheddefaultTableService = azure.createTableService();
+    }
+    return cacheddefaultTableService;
+};
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
@@ -90,9 +97,9 @@ exports.insertEntity = function (tableServiceOrAllParams, tableName, entity, opt
         tableName = tableServiceOrAllParams.tableName;
         entity = tableServiceOrAllParams.entity;
         options = tableServiceOrAllParams.options;
-        exports.createTableIfNotExists(defaultTableService, tableName)
+        exports.createTableIfNotExists(defaultTableService(), tableName)
             .then(function() {
-                insertTheEntity(defaultTableService);
+                insertTheEntity(defaultTableService());
             });
     } else {
         insertTheEntity(tableServiceOrAllParams);
@@ -132,9 +139,9 @@ exports.deleteEntity = function (tableServiceOrAllParams, tableName, entityDescr
         tableName = tableServiceOrAllParams.tableName;
         entityDescriptor = tableServiceOrAllParams.entityDescriptor;
         options = tableServiceOrAllParams.options;
-        exports.createTableIfNotExists(defaultTableService, tableName)
+        exports.createTableIfNotExists(defaultTableService(), tableName)
             .then(function() {
-                deleteTheEntity(defaultTableService);
+                deleteTheEntity(defaultTableService());
             });
     } else {
         deleteTheEntity(tableServiceOrAllParams);
@@ -175,9 +182,9 @@ exports.queryEntity = function (tableServiceOrAllParams, tableName, partitionKey
         partitionKey = tableServiceOrAllParams.entityDescriptor.PartitionKey;
         rowKey = tableServiceOrAllParams.entityDescriptor.RowKey;
         options = tableServiceOrAllParams.options;
-        exports.createTableIfNotExists(defaultTableService, tableName)
+        exports.createTableIfNotExists(defaultTableService(), tableName)
             .then(function() {
-                queryTheEntity(defaultTableService);
+                queryTheEntity(defaultTableService());
             });
     } else {
         queryTheEntity(tableServiceOrAllParams);
@@ -217,7 +224,7 @@ exports.queryEntities = function (tableServiceOrAllParams, tableQuery, options) 
     if (tableServiceOrAllParams && tableServiceOrAllParams.tableQuery) {
         tableQuery = tableServiceOrAllParams.tableQuery;
         options = tableServiceOrAllParams.options;
-        queryTheEntities(defaultTableService);
+        queryTheEntities(defaultTableService());
     } else {
         queryTheEntities(tableServiceOrAllParams);
     }    
@@ -256,7 +263,7 @@ exports.updateEntity = function (tableServiceOrAllParams, tableName, entity, opt
         tableName = tableServiceOrAllParams.tableName;
         entity = tableServiceOrAllParams.entity;
         options = tableServiceOrAllParams.options;
-        updateTheEntity(defaultTableService);
+        updateTheEntity(defaultTableService());
     } else {
         updateTheEntity(tableServiceOrAllParams);
     }    
@@ -295,7 +302,7 @@ exports.mergeEntity = function (tableServiceOrAllParams, tableName, entity, opti
         tableName = tableServiceOrAllParams.tableName;
         entity = tableServiceOrAllParams.entity;
         options = tableServiceOrAllParams.options;
-        mergeTheEntity(defaultTableService);
+        mergeTheEntity(defaultTableService());
     } else {
         mergeTheEntity(tableServiceOrAllParams);
     }    
@@ -334,7 +341,7 @@ exports.insertOrReplaceEntity = function (tableServiceOrAllParams, tableName, en
         tableName = tableServiceOrAllParams.tableName;
         entity = tableServiceOrAllParams.entity;
         options = tableServiceOrAllParams.options;
-        insertOrReplaceTheEntity(defaultTableService);
+        insertOrReplaceTheEntity(defaultTableService());
     } else {
         insertOrReplaceTheEntity(tableServiceOrAllParams);
     }    
@@ -373,7 +380,7 @@ exports.insertOrMergeEntity = function (tableServiceOrAllParams, tableName, enti
         tableName = tableServiceOrAllParams.tableName;
         entity = tableServiceOrAllParams.entity;
         options = tableServiceOrAllParams.options;
-        insertOrMergeTheEntity(defaultTableService);
+        insertOrMergeTheEntity(defaultTableService());
     } else {
         insertOrMergeTheEntity(tableServiceOrAllParams);
     }    

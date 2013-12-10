@@ -3,9 +3,14 @@ var azure = require("azure");
 
 var exports = {};
 
-var defaultServiceBus = azure.createServiceBusService();
+var cachedDefaultServiceBus;
 
-var receivePullSubscriptions = [];
+var defaultServiceBus = function() {
+    if (!cachedDefaultServiceBus) {
+        cachedDefaultServiceBus = azure.createServiceBusService();
+    }
+    return cachedDefaultServiceBus;
+};
 
 // This is the same as the Azure API function with the same name; however, it uses promises instead of callbacks.
 // If there is an error, then a new Error is created with the original error text and included as the argument to the reject call.
@@ -37,7 +42,7 @@ exports.createQueueIfNotExists = function (serviceBusOrAllParams, queuePath, opt
     if (serviceBusOrAllParams && serviceBusOrAllParams.queuePath) {
         queuePath = serviceBusOrAllParams.queuePath;
         options = serviceBusOrAllParams.options;
-        createTheQueue(defaultServiceBus);
+        createTheQueue(defaultServiceBus());
     } else {
         createTheQueue(serviceBusOrAllParams);
     }
@@ -97,7 +102,7 @@ exports.createTopicIfNotExists = function (serviceBusOrAllParams, topicPath, opt
     if (serviceBusOrAllParams && serviceBusOrAllParams.topicPath) {
         topicPath = serviceBusOrAllParams.topicPath;
         options = serviceBusOrAllParams.options;
-        createTheTopic(defaultServiceBus);
+        createTheTopic(defaultServiceBus());
     } else {
         createTheTopic(serviceBusOrAllParams);
     }
@@ -153,9 +158,9 @@ exports.sendQueueMessage = function (serviceBusOrAllParams, queuePath, message, 
         queuePath = serviceBusOrAllParams.queuePath;
         message = serviceBusOrAllParams.message;
         options = serviceBusOrAllParams.options;
-        exports.createQueueIfNotExists(defaultServiceBus, queuePath)
+        exports.createQueueIfNotExists(defaultServiceBus(), queuePath)
             .then(function() {
-                sendTheMessage(defaultServiceBus);
+                sendTheMessage(defaultServiceBus());
             });
     } else {
         sendTheMessage(serviceBusOrAllParams);
@@ -193,9 +198,9 @@ exports.receiveQueueMessage = function (serviceBusOrAllParams, queuePath, option
     if (serviceBusOrAllParams && serviceBusOrAllParams.queuePath) {
         queuePath = serviceBusOrAllParams.queuePath;
         options = serviceBusOrAllParams.options;
-        exports.createQueueIfNotExists(defaultServiceBus, queuePath)
+        exports.createQueueIfNotExists(defaultServiceBus(), queuePath)
             .then(function() {
-                receiveTheMessage(defaultServiceBus);
+                receiveTheMessage(defaultServiceBus());
             });
     } else {
         receiveTheMessage(serviceBusOrAllParams);
@@ -236,7 +241,7 @@ exports.createSubscription = function (serviceBusOrAllParams, topicPath, subscri
         options = serviceBusOrAllParams.options;
         exports.createTopicIfNotExists(serviceBusOrAllParams)
             .then(function() {
-                createTheSubscription(defaultServiceBus);
+                createTheSubscription(defaultServiceBus());
             });
     } else {
         createTheSubscription(serviceBusOrAllParams);
@@ -273,7 +278,7 @@ exports.deleteSubscription = function (serviceBusOrAllParams, topicPath, subscri
         options = serviceBusOrAllParams.options;
         exports.createSubscription(serviceBusOrAllParams)
         .then(function() {
-            deleteTheSubscription(defaultServiceBus);
+            deleteTheSubscription(defaultServiceBus());
         });
     } else {
         deleteTheSubscription(serviceBusOrAllParams);
@@ -314,7 +319,7 @@ exports.sendTopicMessage = function (serviceBusOrAllParams, topicPath, message, 
         options = serviceBusOrAllParams.options;
         exports.createTopicIfNotExists(serviceBusOrAllParams)
             .then(function() {
-                sendTheTopicMessage(defaultServiceBus);
+                sendTheTopicMessage(defaultServiceBus());
             });
     } else {
         sendTheTopicMessage(serviceBusOrAllParams);
@@ -352,7 +357,7 @@ exports.receiveSubscriptionMessage = function (serviceBusOrAllParams, topicPath,
         topicPath = serviceBusOrAllParams.topicPath;
         subscriptionPath = serviceBusOrAllParams.subscriptionPath;
         options = serviceBusOrAllParams.options;
-        receiveTheSubscriptionMessage(defaultServiceBus);
+        receiveTheSubscriptionMessage(defaultServiceBus());
     } else {
         receiveTheSubscriptionMessage(serviceBusOrAllParams);
     }    
@@ -384,7 +389,7 @@ exports.deleteMessage = function (serviceBusOrAllParams, message, options) {
     if (serviceBusOrAllParams && serviceBusOrAllParams.message) {
         message = serviceBusOrAllParams.message;
         options = serviceBusOrAllParams.options;
-        deleteTheMessage(defaultServiceBus);
+        deleteTheMessage(defaultServiceBus());
     } else {
         deleteTheMessage(serviceBusOrAllParams);
     }    
@@ -416,7 +421,7 @@ exports.unlockMessage = function (serviceBusOrAllParams, message, options) {
     if (serviceBusOrAllParams && serviceBusOrAllParams.message) {
         message = serviceBusOrAllParams.message;
         options = serviceBusOrAllParams.options;
-        unlockTheMessage(defaultServiceBus);
+        unlockTheMessage(defaultServiceBus());
     } else {
         unlockTheMessage(serviceBusOrAllParams);
     }    
@@ -454,7 +459,7 @@ exports.getQueue = function (serviceBusOrAllParams, queuePath, options) {
         options = serviceBusOrAllParams.options;
         exports.createQueueIfNotExists(serviceBusOrAllParams)
         .then(function() {
-            getTheQueue(defaultServiceBus);
+            getTheQueue(defaultServiceBus());
         });    
     } else {
         getTheQueue(serviceBusOrAllParams);
@@ -492,7 +497,7 @@ exports.listQueues = function (serviceBusOrAllParams, options) {
         if (serviceBusOrAllParams && serviceBusOrAllParams.options) {
             options = serviceBusOrAllParams.options;
         }
-        listTheQueues(defaultServiceBus);
+        listTheQueues(defaultServiceBus());
     } else {
         listTheQueues(serviceBusOrAllParams);
     }    
@@ -530,7 +535,7 @@ exports.getTopic = function (serviceBusOrAllParams, topicPath, options) {
         options = serviceBusOrAllParams.options;
         exports.createTopicIfNotExists(serviceBusOrAllParams)
         .then(function() {
-            getTheTopic(defaultServiceBus);
+            getTheTopic(defaultServiceBus());
         });    
     } else {
         getTheTopic(serviceBusOrAllParams);
@@ -568,7 +573,7 @@ exports.listTopics = function (serviceBusOrAllParams, options) {
         if (serviceBusOrAllParams && serviceBusOrAllParams.options) {
             options = serviceBusOrAllParams.options;
         }
-        listTheTopics(defaultServiceBus);
+        listTheTopics(defaultServiceBus());
     } else {
         listTheTopics(serviceBusOrAllParams);
     }    
@@ -607,7 +612,7 @@ exports.getSubscription = function (serviceBusOrAllParams, topicPath, subscripti
         options = serviceBusOrAllParams.options;
         exports.createTopicIfNotExists(serviceBusOrAllParams)
         .then(function() {
-            getTheSubscription(defaultServiceBus);
+            getTheSubscription(defaultServiceBus());
         });    
     } else {
         getTheSubscription(serviceBusOrAllParams);
@@ -646,7 +651,7 @@ exports.listSubscriptions = function (serviceBusOrAllParams, topicPath, options)
         topicPath = serviceBusOrAllParams.topicPath;
         exports.createTopicIfNotExists(serviceBusOrAllParams)
         .then(function() {
-            listTheSubscriptions(defaultServiceBus);
+            listTheSubscriptions(defaultServiceBus());
         });    
     } else {
         listTheSubscriptions(serviceBusOrAllParams);
